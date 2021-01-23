@@ -1,0 +1,15 @@
+{
+  "name": "tink_io",
+  "license": "MIT",
+  "tags": [],
+  "classPath": "src",
+  "contributors": [
+    "back2dos"
+  ],
+  "releasenote": "Add some Java impl & various fixes",
+  "version": "0.8.0",
+  "dependencies": {
+    "tink_chunk": "",
+    "tink_streams": ""
+  }
+}

@@ -1,0 +1,25 @@
+{
+	"name": "tink_hxx",
+	"classPath": "src",
+	"dependencies": {
+		"tink_anon": "",
+		"tink_parse": "",
+		"html-entities": ""
+	},
+	"url": "https://github.com/haxetink/tink_hxx/",
+	"contributors": [
+		"back2dos"
+	],
+	"version": "0.24.4",
+	"releasenote": "Minor autocompletion improvements. Added node printing.",
+	"tags": [
+		"tink",
+		"hxx",
+		"jsx",
+		"vdom",
+		"dom",
+		"template",
+		"cross"
+	],
+	"license": "MIT"
+}

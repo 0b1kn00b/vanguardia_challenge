@@ -1,0 +1,19 @@
+{
+  "name": "tink_json",
+  "license": "MIT",
+  "tags": [
+    "tink",
+    "cross",
+    "json"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "back2dos"
+  ],
+  "releasenote": "Fix performance issue on PHP.",
+  "version": "0.10.5",
+  "url": "http://haxetink.org/tink_json",
+  "dependencies": {
+    "tink_typecrawler": ""
+  }
+}
