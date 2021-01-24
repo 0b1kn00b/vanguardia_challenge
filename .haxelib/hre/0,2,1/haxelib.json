@@ -1,0 +1,19 @@
+{
+  "name": "hre",
+  "url": "https://gitlab.com/demurgos/hre",
+  "license": "MIT",
+  "tags": [
+    "cross",
+    "utility",
+    "regular-expression"
+  ],
+  "description": "Haxe Regular Expressions",
+  "version": "0.2.1",
+  "releasenote": "See CHANGELOG.md",
+  "contributors": [
+    "demurgos"
+  ],
+  "classPath": "src",
+  "dependencies": {
+  }
+}

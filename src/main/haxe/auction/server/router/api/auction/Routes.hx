@@ -6,4 +6,11 @@ class Routes extends golgi.Api<Request> implements ModelApi<Auction>{
     super();
     this.delegate = delegate;
   }
+
+  public function start(id:Int){
+    var now = haxe.Timer.stamp();
+  }
+  // public function bid(bid:Bid){
+  //   var value = this.locate(bid.item)
+  // }
 }

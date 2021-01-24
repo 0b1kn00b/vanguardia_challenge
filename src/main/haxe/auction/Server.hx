@@ -19,31 +19,18 @@ typedef ModelApi<T:Item>        = auction.server.pack.ModelApi<T>;
 
 typedef Auction                 = auction.server.pack.Auction;
 typedef AuctionModelApi         = auction.server.pack.AuctionModelApi;
+typedef AuctionId 							= auction.server.pack.AuctionId;
+
 typedef ApiApi                  = auction.server.pack.ApiApi;
 
-@:structInit class User extends Clazz{
-	var name	: String;
-	var id 		: UserId;
-	var bids 	: Array<Int>;
-}
-typedef UserId = Int;
+typedef Bid											= auction.server.pack.Bid;
+typedef MemoryBidModel 					= auction.server.pack.MemoryBidModel;
 
-class Saleable{
-	var name 	: String;
-	var id 		: SaleableId;
-}
-typedef SaleableId = Int;
+typedef CurrencyValueDef 				= auction.server.pack.CurrencyValueDef;
+typedef CurrencyValue 					= auction.server.pack.CurrencyValue;
 
-typedef CurrencyValue = Int;
+typedef Saleable								= auction.server.pack.Saleable;
 
-class Bid{
-	var user 	: User;
-	var bid 	: CurrencyValue;
-	var time  : Float;
-	var item	: SaleableId;
-	public var id(default,null)		: Int;
-}
-
-typedef MemoryBidModel = auction.server.pack.MemoryBidModel;
-
+typedef User										= auction.server.pack.User;
+typedef UserId 									= Int;
 

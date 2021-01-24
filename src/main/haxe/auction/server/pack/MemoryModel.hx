@@ -30,4 +30,7 @@ class MemoryModel<T:Item> implements ModelApi<T>{
   
     return Pledge.pure(Noise);
   }
+  public function locate(i:Int):Pledge<Option<T>,AuctionFailure>{
+    return Pledge.pure(this.data.search((x) -> x.id == i));
+  }
 }

@@ -6,7 +6,7 @@ class Server{
     var router                        = auction.server.Module.router(new Context());
     var express                       = Express.call();
     var static_                       = Express.static_.call('public');
-        express.use(cast static_);
+        express.use(cast static_);//abracadabra
         express.use(
           (req,res,next:express.NextFunction) -> {
             var operation = router.route(GolgiExpressPath.fromRequest(req),null,req);
