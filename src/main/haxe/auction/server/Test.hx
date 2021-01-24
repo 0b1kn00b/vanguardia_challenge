@@ -1,12 +1,15 @@
 package auction.server;
 
-import auction.server.Test;
 using stx.Test;
+
+import auction.server.test.*;
+
+
 
 class Test{
   static public function main(){
-    __.test([
-
-    ]);
+    stx.Test.test([
+      new AuctionTest()
+    ],[]);
   }
 }
