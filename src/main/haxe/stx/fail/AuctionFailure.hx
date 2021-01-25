@@ -1,3 +1,7 @@
 package stx.fail;
 
-enum AuctionFailure{}
+enum AuctionFailure{
+  AuctionFailed(str:String);
+  AuctionEnded;
+  NoSuchAuction;
+}

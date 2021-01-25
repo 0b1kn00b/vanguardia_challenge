@@ -1,10 +1,7 @@
 ./common.hxml
+./server_common.hxml
 
--lib hxnodejs
 
--lib express
--lib express-serve-static-core
--lib golgi
 
 -main Server
 --js dist/server.js

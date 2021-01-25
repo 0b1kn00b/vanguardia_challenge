@@ -1,0 +1,22 @@
+{
+  "data" : [
+    {
+      "name"  : "User1",
+      "pass"  : "IAmUserOne",
+      "role"  : 0,
+      "id"    : 0
+    },
+    {
+      "name"  : "User2",
+      "pass"  : "IAmUserTwo",
+      "role"  : 0,
+      "id"    : 1
+    },
+    {
+      "name"  : "Admin",
+      "pass"  : "IAmTheBoss",
+      "role"  : 1,
+      "id"    : 2
+    }
+  ]
+}

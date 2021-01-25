@@ -6,6 +6,14 @@
 
 
 -lib tink_core
+-lib tink_clone
+
 -lib stx_pico
 -lib stx_nano
 -lib stx_test
+
+-lib golgi
+-lib cloner
+
+--resource src/mock/resources/users.json@users
+--resource src/mock/resources/saleables.json@saleables

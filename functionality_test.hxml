@@ -1,0 +1,7 @@
+./common.hxml
+./server_common.hxml
+
+-D dump=pretty
+-main auction.server.Test
+-js functionality.js
+--cmd node functionality.js
