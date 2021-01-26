@@ -35,3 +35,20 @@
 [submodule ".haxelib/utest/git"]
 	path = .haxelib/utest/git
 	url = https://github.com/haxe-utest/utest.git
+[submodule ".haxelib/feathersui-openfl/git"]
+	path = .haxelib/feathersui-openfl.git
+	url = https://github.com/BowlerHatLLC/feathersui-openfl.git
+[submodule "openfl"]
+	shallow = true
+[submodule ".haxelib/openfl/git"]
+	path = .haxelib/openfl/git
+	url = https://github.com/openfl/openfl.git
+[submodule ".haxelib/openfl-js/git"]
+	path = .haxelib/openfl-js/git
+	url = https://github.com/openfl/openfl-js.git
+[submodule ".haxelib/tink_typecrawler/git"]
+	path = .haxelib/tink_typecrawler/git
+	url = https://github.com/haxetink/tink_typecrawler.git
+[submodule ".haxelib/tink_macro/git"]
+	path = .haxelib/tink_macro/git
+	url = https://github.com/haxetink/tink_macro.git

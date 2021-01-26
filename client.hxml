@@ -1,6 +1,7 @@
 ./common.hxml
 
 -lib colyseus-websocket
+-lib feathersui-openfl
 
 --main Client
 --js dist/public/client.js

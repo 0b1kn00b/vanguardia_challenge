@@ -17,9 +17,9 @@
         "hx3compat": "",
         "stx_assert": "",
         "stx_nano": "",
-        "stx_fn": "",
+        "stx_fn": "git:https://github.com/ohmrun/stx_fn.git",
         "stx_fp": "",
-        "stx_log": "",
+        "stx_log": "git:https://github.com/ohmrun/stx_log.git",
 
         "stx_pico" : "1.0.0"
     },
