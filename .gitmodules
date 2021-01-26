@@ -39,6 +39,7 @@
 	path = .haxelib/feathersui-openfl/git
 	url = https://github.com/BowlerHatLLC/feathersui-openfl.git
 [submodule "openfl"]
+	branch = master
 	shallow = true
 [submodule ".haxelib/openfl/git"]
 	path = .haxelib/openfl/git

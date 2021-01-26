@@ -5,7 +5,7 @@
 -lib openfl-js
 -lib feathersui-openfl
 
-
+-D openfl
 -D js-es=6
 
 --main Client
