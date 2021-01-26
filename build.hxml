@@ -1,0 +1,7 @@
+--each
+  clean.hxml
+  statics.hxml
+--next 
+  server.hxml
+--next
+  client.hxml
