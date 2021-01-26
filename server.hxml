@@ -1,6 +1,8 @@
 ./common.hxml
 ./server_common.hxml
 
+--resource src/mock/resources/users.json@users
+--resource src/mock/resources/saleables.json@saleables
 
 
 -main Server

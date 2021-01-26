@@ -87,7 +87,6 @@ EReg.prototype = {
 	,__class__: EReg
 };
 var Express = require("express");
-var ExpressWs = require("express-ws");
 var HxOverrides = function() { };
 HxOverrides.__name__ = "HxOverrides";
 HxOverrides.cca = function(s,index) {
@@ -340,19 +339,19 @@ Reflect.isFunction = function(f) {
 };
 var Server = function() { };
 Server.__name__ = "Server";
-Server.main = function() {
-	haxe_Log.trace(process.cwd(),{ fileName : "Server.hx", lineNumber : 9, className : "Server", methodName : "main"});
+Server.play = function(context) {
+	haxe_Log.trace(process.cwd(),{ fileName : "Server.hx", lineNumber : 13, className : "Server", methodName : "play"});
 	var router = auction_server_Module.router();
 	var express = Express();
 	var static_ = Express.static("public");
 	express.use(static_);
-	var tmp = auction_server_Handler._new(router);
+	var tmp = auction_server_Handler._new(context,router);
 	express.use(tmp);
-	var ws = ExpressWs(express);
-	var wss = ws.app;
-	var tmp = auction_server_ws_Handler.toWebsocketRequestHandler(auction_server_ws_Handler._new(auction_server_ws_Module.router()));
-	wss.ws("/api",tmp);
 	var server = express.listen(3000);
+};
+Server.main = function() {
+	var context = new auction_server_context_ContextSchema().mock();
+	stx_nano_PledgeLift.each(context,Server.play);
 };
 var Std = function() { };
 Std.__name__ = "Std";
@@ -581,14 +580,13 @@ auction_server_GolgiExpressPath.fromRequest = function(self) {
 };
 var auction_server_HandlerLift = function() { };
 auction_server_HandlerLift.__name__ = "auction.server.HandlerLift";
-auction_server_HandlerLift.apply = function(router,req,res,next) {
+auction_server_HandlerLift.apply = function(context,router,req,res,next) {
 	var path = auction_server_GolgiExpressPath.fromRequest(req);
 	try {
 		var operation = router.route(path,null,req);
 		if(operation._hx_index == 2) {
 			var _g = operation.result;
 			var home = "" + process.cwd() + "/templates/home.html";
-			haxe_Log.trace(home,{ fileName : "src/main/haxe/auction/server/Handler.hx", lineNumber : 20, className : "auction.server.HandlerLift", methodName : "apply"});
 			res.sendFile(home);
 		} else {
 			next();
@@ -605,10 +603,11 @@ auction_server_HandlerLift.apply = function(router,req,res,next) {
 	}
 };
 var auction_server_Handler = {};
-auction_server_Handler._new = function(router) {
+auction_server_Handler._new = function(context,router) {
+	var context1 = context;
 	var router1 = router;
 	var this1 = function(req,res,next) {
-		auction_server_Handler._.apply(router1,req,res,next);
+		auction_server_Handler._.apply(context1,router1,req,res,next);
 	};
 	return this1;
 };
@@ -1567,37 +1566,6 @@ auction_server_user_UserSchema.prototype = $extend(stx_pico_Clazz.prototype,{
 	}
 	,__class__: auction_server_user_UserSchema
 });
-var auction_server_ws_HandlerLift = function() { };
-auction_server_ws_HandlerLift.__name__ = "auction.server.ws.HandlerLift";
-var auction_server_ws_Handler = {};
-auction_server_ws_Handler._new = function(router) {
-	var this1 = function(ws,req,next) {
-		haxe_Log.trace(req,{ fileName : "src/main/haxe/auction/server/ws/Handler.hx", lineNumber : 9, className : "auction.server.ws._Handler.Handler_Impl_", methodName : "_new"});
-		var path = auction_server_GolgiExpressPath.fromRequest(req);
-		try {
-			var operation = router.route(path,null,req);
-		} catch( _g ) {
-			haxe_NativeStackTrace.lastError = _g;
-			var _g1 = haxe_Exception.caught(_g).unwrap();
-			if(js_Boot.__instanceof(_g1,golgi_Error)) {
-				var e = _g1;
-				next(e);
-			} else {
-				throw _g;
-			}
-		}
-	};
-	return this1;
-};
-auction_server_ws_Handler.toWebsocketRequestHandler = function(this1) {
-	return this1;
-};
-var auction_server_ws_Module = function() { };
-auction_server_ws_Module.__name__ = "auction.server.ws.Module";
-auction_server_ws_Module.router = function() {
-	var root = new auction_server_router_api_Routes();
-	return new auction_server_router_api_Golgi(root);
-};
 var cloner_Cloner = function() {
 	this.stringMapCloner = new cloner_MapCloner(this,haxe_ds_StringMap);
 	this.intMapCloner = new cloner_MapCloner(this,haxe_ds_IntMap);
@@ -4406,6 +4374,19 @@ stx_nano_PledgeLift.errata = function(fn,self) {
 			break;
 		}
 		return stx_nano_Res._new(self);
+	});
+};
+stx_nano_PledgeLift.each = function(self,fn) {
+	stx_nano_Pledge.prj(self).handle(function(res) {
+		switch(res._hx_index) {
+		case 0:
+			var t = res.t;
+			fn(t);
+			break;
+		case 1:
+			var e = res.e;
+			break;
+		}
 	});
 };
 var stx_nano_Pledge = {};
@@ -7396,6 +7377,7 @@ tink_core_Lazy.ofConst = function(c) {
 	return new tink_core__$Lazy_LazyConst(c);
 };
 var tink_core__$Lazy_LazyFunc = function(f,from) {
+	this.busy = false;
 	this.f = f;
 	this.from = from;
 };
@@ -7405,6 +7387,7 @@ tink_core__$Lazy_LazyFunc.prototype = {
 	f: null
 	,from: null
 	,result: null
+	,busy: null
 	,underlying: function() {
 		return this.from;
 	}
@@ -7415,9 +7398,13 @@ tink_core__$Lazy_LazyFunc.prototype = {
 		return this.result;
 	}
 	,compute: function() {
+		if(this.busy) {
+			throw haxe_Exception.thrown(new tink_core_TypedError(null,"circular lazyness",{ fileName : "tink/core/Lazy.hx", lineNumber : 85, className : "tink.core._Lazy.LazyFunc", methodName : "compute"}));
+		}
 		var _g = this.f;
 		if(_g != null) {
 			var v = _g;
+			this.busy = true;
 			this.f = null;
 			var _g = this.from;
 			if(_g != null) {
@@ -7437,6 +7424,7 @@ tink_core__$Lazy_LazyFunc.prototype = {
 				}
 			}
 			this.result = v();
+			this.busy = false;
 		}
 	}
 	,__class__: tink_core__$Lazy_LazyFunc
@@ -8778,7 +8766,7 @@ var Float = Number;
 var Bool = Boolean;
 var Class = { };
 var Enum = { };
-haxe_Resource.content = [];
+haxe_Resource.content = [{ name : "users", data : "ewogICJkYXRhIiA6IFsKICAgIHsKICAgICAgIm5hbWUiICA6ICJVc2VyMSIsCiAgICAgICJwYXNzIiAgOiAiSUFtVXNlck9uZSIsCiAgICAgICJyb2xlIiAgOiAwLAogICAgICAiaWQiICAgIDogMAogICAgfSwKICAgIHsKICAgICAgIm5hbWUiICA6ICJVc2VyMiIsCiAgICAgICJwYXNzIiAgOiAiSUFtVXNlclR3byIsCiAgICAgICJyb2xlIiAgOiAwLAogICAgICAiaWQiICAgIDogMQogICAgfSwKICAgIHsKICAgICAgIm5hbWUiICA6ICJBZG1pbiIsCiAgICAgICJwYXNzIiAgOiAiSUFtVGhlQm9zcyIsCiAgICAgICJyb2xlIiAgOiAxLAogICAgICAiaWQiICAgIDogMgogICAgfQogIF0KfQ"},{ name : "saleables", data : "ewogICJkYXRhIiA6IFsKICAgIHsKICAgICAgIm5hbWUiICAgICAgICA6ICJvb2gsIGxvb2tlZWUiLAogICAgICAiZGVzY3JpcHRpb24iIDogImEgdGhpbmd3YW5nOiBsb29rISIsCiAgICAgICJpbWciICAgICAgICAgOiAiNDMwLmpwZyIsCiAgICAgICJpZCIgICAgICAgICAgOiAwCiAgICB9LAogICAgewogICAgICAibmFtZSIgICAgICAgIDogInByZXR0eSBwcmV0dHkiLAogICAgICAiZGVzY3JpcHRpb24iIDogIm91ciBwZXR1bGFudCBHb2Qgd2lsbCByZW1vdmUgeW91IGZyb20gdGhpcyBraW5nZG9tIGlmIHlvdSBhcmUgbm90IHNtb290aCIsCiAgICAgICJpbWciICAgICAgICAgOiAiNDg2NjQ3OS5qcGciLAogICAgICAiaWQiICAgICAgICAgIDogMQogICAgfQogIF0KfQ"}];
 haxe_ds_ObjectMap.count = 0;
 js_Boot.__toStr = ({ }).toString;
 auction_server_Handler._ = auction_server_HandlerLift;
@@ -8786,7 +8774,6 @@ auction_server_bid_BidSchema.counter = new auction_server_pack_Counter();
 auction_server_saleable_Saleable.counter = new auction_server_pack_Counter();
 auction_server_session_Session.counter = new auction_server_pack_Counter();
 auction_server_session_SessionSchema.counter = new auction_server_pack_Counter();
-auction_server_ws_Handler._ = auction_server_ws_HandlerLift;
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe_crypto_Base64.BYTES = haxe_io_Bytes.ofString(haxe_crypto_Base64.CHARS);
 stx_nano_Couple._ = stx_nano_CoupleLift;

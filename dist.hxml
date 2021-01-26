@@ -1,5 +1,0 @@
---cmd rm -r dist/
---cmd mkdir dist
---cmd mkdir dist/public
---cmd cp -r src/main/assets dist/public/
---cmd cp -r src/main/templates dist/templates
