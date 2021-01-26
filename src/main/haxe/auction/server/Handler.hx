@@ -1,0 +1,28 @@
+package auction.server;
+
+import auction.server.router.Operation;
+import auction.server.router.api.Operation;
+
+abstract Handler(auction.server.express.RequestHandler) from auction.server.express.RequestHandler to auction.server.express.RequestHandler{
+  static public var _(default,never)  = HandlerLift;
+  public function new(router){
+    this = _.apply.bind(router);
+  }
+}
+class HandlerLift{
+  static public function apply(router,req:auction.server.express.Request,res:auction.server.express.Response,next:express.NextFunction){
+    var path          = GolgiExpressPath.fromRequest(req);
+    try{
+      var operation   = router.route(path,null,req);
+      switch(operation){
+        case Home(_)  : 
+          var home = '${js.Node.process.cwd()}/templates/home.html';
+          trace(home);
+          res.sendFile(home);
+        default       : (next:Void -> Void)();
+      }
+    }catch(e:golgi.Error){
+      (next:(err:Dynamic) -> Void)(e);
+    }
+  }
+}

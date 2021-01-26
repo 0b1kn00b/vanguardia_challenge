@@ -8,4 +8,11 @@ class Routes extends golgi.Api<Request>{
     var res     = subroute.route(sub_glg);
     return res;
   }
+  public function _404():Noise{
+    return Noise;
+  }
+  @:default
+  public function home(){
+    return Noise;
+  }
 }

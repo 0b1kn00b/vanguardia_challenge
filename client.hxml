@@ -1,6 +1,6 @@
 ./common.hxml
+
+-lib colyseus-websocket
+
 --main Client
---js dist/client.js
---cmd mkdir -p dist/public
---cmd cp src/main/templates/index.html dist/public/index.html
---cmd cp -r src/main/assets/ dist/public/
+--js dist/public/client.js

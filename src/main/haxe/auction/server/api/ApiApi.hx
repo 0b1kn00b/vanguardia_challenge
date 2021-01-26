@@ -7,4 +7,4 @@ interface ApiApi {
   public var auction    : AuctionModelApi;
   public var saleable   : SaleableModelApi;
   public var bid        : BidModelApi;
-} 
+}  

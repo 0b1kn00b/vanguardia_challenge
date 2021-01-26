@@ -210,7 +210,6 @@ typedef Express = {
 	@:overload(function<P, ResBody, ReqBody, ReqQuery, Locals>(path:express_serve_static_core.PathParams, handlers:haxe.extern.Rest<express_serve_static_core.RequestHandlerParams<P, ResBody, ReqBody, ReqQuery, Locals>>):Express { })
 	@:overload(function(path:express_serve_static_core.PathParams, subApplication:express_serve_static_core.Application):Express { })
 	dynamic function all<P, ResBody, ReqBody, ReqQuery, Locals>(path:express_serve_static_core.PathParams, handlers:haxe.extern.Rest<express_serve_static_core.RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals>>):Express;
-	
 	@:overload(function<P, ResBody, ReqBody, ReqQuery, Locals>(path:express_serve_static_core.PathParams, handlers:haxe.extern.Rest<express_serve_static_core.RequestHandlerParams<P, ResBody, ReqBody, ReqQuery, Locals>>):Express { })
 	@:overload(function(path:express_serve_static_core.PathParams, subApplication:express_serve_static_core.Application):Express { })
 	dynamic function post<P, ResBody, ReqBody, ReqQuery, Locals>(path:express_serve_static_core.PathParams, handlers:haxe.extern.Rest<express_serve_static_core.RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals>>):Express;

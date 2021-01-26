@@ -1,7 +1,9 @@
 package stx.fail;
 
 enum AuctionFailure{
-  AuctionFailed(str:String);
-  AuctionEnded;
-  NoSuchAuction;
+  E_AuctionFailed(str:String);
+  E_AuctionEnded;
+  E_NoSuchAuction;
+  E_Golgi_Error(error:golgi.Error);
+  
 }

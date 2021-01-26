@@ -15,7 +15,7 @@ package auction.server.auction;
 		
 	public function stamp():Pledge<Auction,AuctionFailure>{
 		return if(this.start_time > 0){
-			Pledge.reject(__.fault().of(AuctionFailed("already started")));
+			Pledge.reject(__.fault().of(E_AuctionFailed("already started")));
 		}else{
 			var that 						= clone();
 					that.start_time = haxe.Timer.stamp();

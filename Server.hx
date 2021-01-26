@@ -1,24 +1,25 @@
+using stx.Pico;
+using stx.Nano;
+
 import auction.Server;
 import auction.server.router.*;
 
 class Server{
   static public function main(){
-    var router                        = auction.server.Module.router(new Context());
+    trace(js.Node.process.cwd());
+    var router                        = auction.server.Module.router();
     var express                       = Express.call();
     var static_                       = Express.static_.call('public');
         express.use(cast static_);//abracadabra
-        express.use(
-          (req,res,next:express.NextFunction) -> {
-            var operation = router.route(GolgiExpressPath.fromRequest(req),null,req);
-            (next:Void->Void)();
-          }
+        express.use(new auction.server.Handler(router));
+    var ws                            = ExpressWs.call(express);
+    var wss                           = ws.app;
+        wss
+        .ws(
+          "/api",
+          new auction.server.ws.Handler(auction.server.ws.Module.router()).toWebsocketRequestHandler()
         );
     var server                        = express.listen(3000);
         
-  }
-}
-abstract GolgiExpressPath(Array<String>) from Array<String> to Array<String>{
-  @:from static public function fromRequest(self:Request):GolgiExpressPath{
-    return self.path.split("/");
   }
 }

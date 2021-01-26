@@ -626,6 +626,47 @@ Type.enumParameters = function(e) {
 };
 var auction_Server = function() { };
 auction_Server.__name__ = "auction.Server";
+var auction_server_GolgiExpressPath = {};
+auction_server_GolgiExpressPath._new = function(self) {
+	var this1 = self;
+	return this1;
+};
+auction_server_GolgiExpressPath.fromRequest = function(self) {
+	var arr = self.path.split("/");
+	arr.shift();
+	return auction_server_GolgiExpressPath._new(arr);
+};
+var auction_server_HandlerLift = function() { };
+auction_server_HandlerLift.__name__ = "auction.server.HandlerLift";
+auction_server_HandlerLift.apply = function(router,req,res,next) {
+	var path = auction_server_GolgiExpressPath.fromRequest(req);
+	try {
+		var operation = router.route(path,null,req);
+		if(operation._hx_index == 2) {
+			var _g = operation.result;
+			res.sendFile("" + process.cwd() + "/templates/home.html");
+		} else {
+			next();
+		}
+	} catch( _g ) {
+		haxe_NativeStackTrace.lastError = _g;
+		var _g1 = haxe_Exception.caught(_g).unwrap();
+		if(js_Boot.__instanceof(_g1,golgi_Error)) {
+			var e = _g1;
+			next(e);
+		} else {
+			throw _g;
+		}
+	}
+};
+var auction_server_Handler = {};
+auction_server_Handler._new = function(router) {
+	var router1 = router;
+	var this1 = function(req,res,next) {
+		auction_server_Handler._.apply(router1,req,res,next);
+	};
+	return this1;
+};
 var auction_server_Test = function() { };
 auction_server_Test.__name__ = "auction.server.Test";
 auction_server_Test.main = function() {
@@ -712,7 +753,7 @@ auction_server_auction_Auction.prototype = $extend(auction_server_store_VO.proto
 	,stamp: function() {
 		if(this.start_time > 0) {
 			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/auction/Auction.hx", lineNumber : 18, className : "auction.server.auction.Auction", methodName : "stamp"});
-			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.AuctionFailed("already started"))),haxe_ds_Option.None,this1)));
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_AuctionFailed("already started"))),haxe_ds_Option.None,this1)));
 		} else {
 			var that = this.clone();
 			var hrtime = process.hrtime();
@@ -921,7 +962,7 @@ auction_server_auction_AuctionMemoryModel.prototype = $extend(auction_server_sto
 				break;
 			case 1:
 				var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/auction/AuctionMemoryModel.hx", lineNumber : 35, className : "auction.server.auction.AuctionMemoryModel", methodName : "place_bid"});
-				tmp = stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.NoSuchAuction)),haxe_ds_Option.None,this1)));
+				tmp = stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_NoSuchAuction)),haxe_ds_Option.None,this1)));
 				break;
 			}
 			return tmp;
@@ -1091,13 +1132,27 @@ auction_server_router_Golgi.prototype = $extend(golgi_Golgi.prototype,{
 		this.dict.h["api"] = function(parts,params,request) {
 			return auction_server_router_Operation.Api(_gthis.api.api(request,new golgi_Subroute(parts.slice(1),params,request)));
 		};
+		this.dict.h["_404"] = function(parts,params,request) {
+			if(parts.length > 1) {
+				throw haxe_Exception.thrown(golgi_Error.TooManyValues);
+			}
+			return auction_server_router_Operation._404(_gthis.api._404());
+		};
+		this.dict.h[""] = function(parts,params,request) {
+			if(parts.length > 1) {
+				throw haxe_Exception.thrown(golgi_Error.TooManyValues);
+			}
+			return auction_server_router_Operation.Home(_gthis.api.home());
+		};
 	}
 	,__class__: auction_server_router_Golgi
 });
 var auction_server_router_Operation = $hxEnums["auction.server.router.Operation"] = { __ename__:"auction.server.router.Operation",__constructs__:null
 	,Api: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="Api",$_.__params__ = ["result"],$_)
+	,_404: ($_=function(result) { return {_hx_index:1,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="_404",$_.__params__ = ["result"],$_)
+	,Home: ($_=function(result) { return {_hx_index:2,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="Home",$_.__params__ = ["result"],$_)
 };
-auction_server_router_Operation.__constructs__ = [auction_server_router_Operation.Api];
+auction_server_router_Operation.__constructs__ = [auction_server_router_Operation.Api,auction_server_router_Operation._404,auction_server_router_Operation.Home];
 auction_server_router_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
 var golgi_Api = function() {
 };
@@ -1117,6 +1172,12 @@ auction_server_router_Routes.prototype = $extend(golgi_Api.prototype,{
 		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
 		return res;
 	}
+	,_404: function() {
+		return null;
+	}
+	,home: function() {
+		return null;
+	}
 	,__class__: auction_server_router_Routes
 });
 var auction_server_router_api_Golgi = function(api,meta) {
@@ -1127,20 +1188,32 @@ auction_server_router_api_Golgi.__super__ = golgi_Golgi;
 auction_server_router_api_Golgi.prototype = $extend(golgi_Golgi.prototype,{
 	__init: function() {
 		var _gthis = this;
+		this.dict.h["saleable"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Saleable(_gthis.api.saleable(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
+		this.dict.h["bid"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Bid(_gthis.api.bid(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
 		this.dict.h["auction"] = function(parts,params,request) {
 			return auction_server_router_api_Operation.Auction(_gthis.api.auction(request,new golgi_Subroute(parts.slice(1),params,request)));
 		};
 		this.dict.h["user"] = function(parts,params,request) {
 			return auction_server_router_api_Operation.User(_gthis.api.user(request,new golgi_Subroute(parts.slice(1),params,request)));
 		};
+		this.dict.h["session"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Session(_gthis.api.session(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
 	}
 	,__class__: auction_server_router_api_Golgi
 });
 var auction_server_router_api_Operation = $hxEnums["auction.server.router.api.Operation"] = { __ename__:"auction.server.router.api.Operation",__constructs__:null
-	,Auction: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Auction",$_.__params__ = ["result"],$_)
-	,User: ($_=function(result) { return {_hx_index:1,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="User",$_.__params__ = ["result"],$_)
+	,Saleable: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Saleable",$_.__params__ = ["result"],$_)
+	,Bid: ($_=function(result) { return {_hx_index:1,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Bid",$_.__params__ = ["result"],$_)
+	,Auction: ($_=function(result) { return {_hx_index:2,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Auction",$_.__params__ = ["result"],$_)
+	,User: ($_=function(result) { return {_hx_index:3,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="User",$_.__params__ = ["result"],$_)
+	,Session: ($_=function(result) { return {_hx_index:4,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Session",$_.__params__ = ["result"],$_)
 };
-auction_server_router_api_Operation.__constructs__ = [auction_server_router_api_Operation.Auction,auction_server_router_api_Operation.User];
+auction_server_router_api_Operation.__constructs__ = [auction_server_router_api_Operation.Saleable,auction_server_router_api_Operation.Bid,auction_server_router_api_Operation.Auction,auction_server_router_api_Operation.User,auction_server_router_api_Operation.Session];
 auction_server_router_api_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
 var auction_server_router_api_Routes = function() {
 	golgi_Api.call(this);
@@ -1148,7 +1221,19 @@ var auction_server_router_api_Routes = function() {
 auction_server_router_api_Routes.__name__ = "auction.server.router.api.Routes";
 auction_server_router_api_Routes.__super__ = golgi_Api;
 auction_server_router_api_Routes.prototype = $extend(golgi_Api.prototype,{
-	auction: function(request,subroute) {
+	saleable: function(request,subroute) {
+		var sub_api = new auction_server_router_api_saleable_Routes();
+		var sub_glg = new auction_server_router_api_saleable_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,bid: function(request,subroute) {
+		var sub_api = new auction_server_router_api_bid_Routes();
+		var sub_glg = new auction_server_router_api_bid_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,auction: function(request,subroute) {
 		var sub_api = new auction_server_router_api_auction_Routes();
 		var sub_glg = new auction_server_router_api_auction_Golgi(sub_api);
 		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
@@ -1157,6 +1242,12 @@ auction_server_router_api_Routes.prototype = $extend(golgi_Api.prototype,{
 	,user: function(request,subroute) {
 		var sub_api = new auction_server_router_api_user_Routes();
 		var sub_glg = new auction_server_router_api_user_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,session: function(request,subroute) {
+		var sub_api = new auction_server_router_api_session_Routes();
+		var sub_glg = new auction_server_router_api_session_Golgi(sub_api);
 		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
 		return res;
 	}
@@ -1196,6 +1287,72 @@ auction_server_router_api_auction_Routes.prototype = $extend(golgi_Api.prototype
 	}
 	,__class__: auction_server_router_api_auction_Routes
 });
+var auction_server_router_api_bid_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_bid_Golgi.__name__ = "auction.server.router.api.bid.Golgi";
+auction_server_router_api_bid_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_bid_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_bid_Golgi
+});
+var auction_server_router_api_bid_Operation = $hxEnums["auction.server.router.api.bid.Operation"] = { __ename__:"auction.server.router.api.bid.Operation",__constructs__:null
+};
+auction_server_router_api_bid_Operation.__constructs__ = [];
+auction_server_router_api_bid_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_bid_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_bid_Routes.__name__ = "auction.server.router.api.bid.Routes";
+auction_server_router_api_bid_Routes.__super__ = golgi_Api;
+auction_server_router_api_bid_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_bid_Routes
+});
+var auction_server_router_api_saleable_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_saleable_Golgi.__name__ = "auction.server.router.api.saleable.Golgi";
+auction_server_router_api_saleable_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_saleable_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_saleable_Golgi
+});
+var auction_server_router_api_saleable_Operation = $hxEnums["auction.server.router.api.saleable.Operation"] = { __ename__:"auction.server.router.api.saleable.Operation",__constructs__:null
+};
+auction_server_router_api_saleable_Operation.__constructs__ = [];
+auction_server_router_api_saleable_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_saleable_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_saleable_Routes.__name__ = "auction.server.router.api.saleable.Routes";
+auction_server_router_api_saleable_Routes.__super__ = golgi_Api;
+auction_server_router_api_saleable_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_saleable_Routes
+});
+var auction_server_router_api_session_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_session_Golgi.__name__ = "auction.server.router.api.session.Golgi";
+auction_server_router_api_session_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_session_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_session_Golgi
+});
+var auction_server_router_api_session_Operation = $hxEnums["auction.server.router.api.session.Operation"] = { __ename__:"auction.server.router.api.session.Operation",__constructs__:null
+};
+auction_server_router_api_session_Operation.__constructs__ = [];
+auction_server_router_api_session_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_session_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_session_Routes.__name__ = "auction.server.router.api.session.Routes";
+auction_server_router_api_session_Routes.__super__ = golgi_Api;
+auction_server_router_api_session_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_session_Routes
+});
 var auction_server_router_api_user_Golgi = function(api,meta) {
 	golgi_Golgi.call(this,api,meta);
 };
@@ -1203,17 +1360,12 @@ auction_server_router_api_user_Golgi.__name__ = "auction.server.router.api.user.
 auction_server_router_api_user_Golgi.__super__ = golgi_Golgi;
 auction_server_router_api_user_Golgi.prototype = $extend(golgi_Golgi.prototype,{
 	__init: function() {
-		var _gthis = this;
-		this.dict.h["auction"] = function(parts,params,request) {
-			return auction_server_router_api_user_Operation.Auction(_gthis.api.auction(request,new golgi_Subroute(parts.slice(1),params,request)));
-		};
 	}
 	,__class__: auction_server_router_api_user_Golgi
 });
 var auction_server_router_api_user_Operation = $hxEnums["auction.server.router.api.user.Operation"] = { __ename__:"auction.server.router.api.user.Operation",__constructs__:null
-	,Auction: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.api.user.Operation",toString:$estr}; },$_._hx_name="Auction",$_.__params__ = ["result"],$_)
 };
-auction_server_router_api_user_Operation.__constructs__ = [auction_server_router_api_user_Operation.Auction];
+auction_server_router_api_user_Operation.__constructs__ = [];
 auction_server_router_api_user_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
 var auction_server_router_api_user_Routes = function() {
 	golgi_Api.call(this);
@@ -1221,13 +1373,7 @@ var auction_server_router_api_user_Routes = function() {
 auction_server_router_api_user_Routes.__name__ = "auction.server.router.api.user.Routes";
 auction_server_router_api_user_Routes.__super__ = golgi_Api;
 auction_server_router_api_user_Routes.prototype = $extend(golgi_Api.prototype,{
-	auction: function(request,subroute) {
-		var sub_api = new auction_server_router_api_auction_Routes();
-		var sub_glg = new auction_server_router_api_auction_Golgi(sub_api);
-		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
-		return res;
-	}
-	,__class__: auction_server_router_api_user_Routes
+	__class__: auction_server_router_api_user_Routes
 });
 var auction_server_saleable_Saleable = function(name,description,img,id) {
 	this.name = name;
@@ -1506,7 +1652,7 @@ auction_server_test_RouterTest.prototype = $extend(utest_Test.prototype,{
 		var routes = new auction_server_router_Routes();
 		var golgi = new auction_server_router_Golgi(routes);
 		var val = golgi.route(["api","auction","start"],null,{ id : "x"});
-		haxe_Log.trace(val,{ fileName : "src/main/haxe/auction/server/test/RouterTest.hx", lineNumber : 9, className : "auction.server.test.RouterTest", methodName : "test"});
+		haxe_Log.trace(val,{ fileName : "src/main/haxe/auction/server/test/RouterTest.hx", lineNumber : 11, className : "auction.server.test.RouterTest", methodName : "test"});
 	}
 	,__initializeUtest__: function() {
 		var _gthis = this;
@@ -8099,11 +8245,12 @@ var stx_fail_AssertFailure = $hxEnums["stx.fail.AssertFailure"] = { __ename__:"s
 };
 stx_fail_AssertFailure.__constructs__ = [stx_fail_AssertFailure.PredicateFailed];
 var stx_fail_AuctionFailure = $hxEnums["stx.fail.AuctionFailure"] = { __ename__:"stx.fail.AuctionFailure",__constructs__:null
-	,AuctionFailed: ($_=function(str) { return {_hx_index:0,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="AuctionFailed",$_.__params__ = ["str"],$_)
-	,AuctionEnded: {_hx_name:"AuctionEnded",_hx_index:1,__enum__:"stx.fail.AuctionFailure",toString:$estr}
-	,NoSuchAuction: {_hx_name:"NoSuchAuction",_hx_index:2,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_AuctionFailed: ($_=function(str) { return {_hx_index:0,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_AuctionFailed",$_.__params__ = ["str"],$_)
+	,E_AuctionEnded: {_hx_name:"E_AuctionEnded",_hx_index:1,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_NoSuchAuction: {_hx_name:"E_NoSuchAuction",_hx_index:2,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_Golgi_Error: ($_=function(error) { return {_hx_index:3,error:error,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Golgi_Error",$_.__params__ = ["error"],$_)
 };
-stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.AuctionFailed,stx_fail_AuctionFailure.AuctionEnded,stx_fail_AuctionFailure.NoSuchAuction];
+stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.E_AuctionFailed,stx_fail_AuctionFailure.E_AuctionEnded,stx_fail_AuctionFailure.E_NoSuchAuction,stx_fail_AuctionFailure.E_Golgi_Error];
 var stx_fail_LogFailure = $hxEnums["stx.fail.LogFailure"] = { __ename__:"stx.fail.LogFailure",__constructs__:null
 	,E_Log_UnderLogLevel: {_hx_name:"E_Log_UnderLogLevel",_hx_index:0,__enum__:"stx.fail.LogFailure",toString:$estr}
 	,E_Log_SourceNotInPackage: ($_=function(source,dir) { return {_hx_index:1,source:source,dir:dir,__enum__:"stx.fail.LogFailure",toString:$estr}; },$_._hx_name="E_Log_SourceNotInPackage",$_.__params__ = ["source","dir"],$_)
@@ -17305,6 +17452,7 @@ var facade = stx_log_Facade.unit();
 var this1 = stx_log_Signal.get_instance();
 this1.attach(stx_log_Facade.toLoggerApi(facade));
 stx_log_Signal.is_custom = false;
+auction_server_Handler._ = auction_server_HandlerLift;
 auction_server_bid_BidSchema.counter = new auction_server_pack_Counter();
 auction_server_saleable_Saleable.counter = new auction_server_pack_Counter();
 auction_server_session_Session.counter = new auction_server_pack_Counter();

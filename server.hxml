@@ -5,6 +5,3 @@
 
 -main Server
 --js dist/server.js
---cmd mkdir -p dist/public
---cmd cp -r src/main/assets dist/public/
---cmd cp -r src/main/templates/* dist/

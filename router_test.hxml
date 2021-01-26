@@ -1,0 +1,11 @@
+
+
+--each
+./common.hxml
+--next
+--resource src/mock/resources/users.json@users
+--resource src/mock/resources/saleables.json@saleables
+./server_common.hxml
+./server.hxml
+#--cmd npm start & 
+

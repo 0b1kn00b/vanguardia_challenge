@@ -4,13 +4,17 @@
   "description": "This is an example Haxe project scaffolded by Visual Studio Code.",
   "main": "dist/server.jx",
   "scripts": {
-    "test"  : "node test.js",
-    "start" : "cd dist && node server.js"
+    "test": "node test.js",
+    "start": "cd dist && node server.js"
   },
   "author": "0b1kn00b",
   "license": "ISC",
   "dependencies": {
     "@types/express": "^4.17.11",
-    "express": "^4.17.1"
+    "@types/express-ws": "^3.0.0",
+    "@types/ws": "^7.4.0",
+    "express": "^4.17.1",
+    "express-ws": "^4.0.0",
+    "ws": "^7.4.2"
   }
 }

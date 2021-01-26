@@ -87,6 +87,7 @@ EReg.prototype = {
 	,__class__: EReg
 };
 var Express = require("express");
+var ExpressWs = require("express-ws");
 var HxOverrides = function() { };
 HxOverrides.__name__ = "HxOverrides";
 HxOverrides.cca = function(s,index) {
@@ -299,6 +300,37 @@ Reflect.field = function(o,field) {
 		return null;
 	}
 };
+Reflect.getProperty = function(o,field) {
+	var tmp;
+	if(o == null) {
+		return null;
+	} else {
+		var tmp1;
+		if(o.__properties__) {
+			tmp = o.__properties__["get_" + field];
+			tmp1 = tmp;
+		} else {
+			tmp1 = false;
+		}
+		if(tmp1) {
+			return o[tmp]();
+		} else {
+			return o[field];
+		}
+	}
+};
+Reflect.fields = function(o) {
+	var a = [];
+	if(o != null) {
+		var hasOwnProperty = Object.prototype.hasOwnProperty;
+		for( var f in o ) {
+		if(f != "__id__" && f != "hx__closures__" && hasOwnProperty.call(o,f)) {
+			a.push(f);
+		}
+		}
+	}
+	return a;
+};
 Reflect.isFunction = function(f) {
 	if(typeof(f) == "function") {
 		return !(f.__name__ || f.__ename__);
@@ -309,19 +341,18 @@ Reflect.isFunction = function(f) {
 var Server = function() { };
 Server.__name__ = "Server";
 Server.main = function() {
-	var router = auction_server_Module.router(new auction_server_pack_Context());
+	haxe_Log.trace(process.cwd(),{ fileName : "Server.hx", lineNumber : 9, className : "Server", methodName : "main"});
+	var router = auction_server_Module.router();
 	var express = Express();
 	var static_ = Express.static("public");
 	express.use(static_);
-	express.use(function(req,res,next) {
-		var operation = router.route(GolgiExpressPath.fromRequest(req),null,req);
-		next();
-	});
+	var tmp = auction_server_Handler._new(router);
+	express.use(tmp);
+	var ws = ExpressWs(express);
+	var wss = ws.app;
+	var tmp = auction_server_ws_Handler.toWebsocketRequestHandler(auction_server_ws_Handler._new(auction_server_ws_Module.router()));
+	wss.ws("/api",tmp);
 	var server = express.listen(3000);
-};
-var GolgiExpressPath = {};
-GolgiExpressPath.fromRequest = function(self) {
-	return self.path.split("/");
 };
 var Std = function() { };
 Std.__name__ = "Std";
@@ -476,8 +507,24 @@ StringTools.hex = function(n,digits) {
 	}
 	return s;
 };
+var ValueType = $hxEnums["ValueType"] = { __ename__:true,__constructs__:null
+	,TNull: {_hx_name:"TNull",_hx_index:0,__enum__:"ValueType",toString:$estr}
+	,TInt: {_hx_name:"TInt",_hx_index:1,__enum__:"ValueType",toString:$estr}
+	,TFloat: {_hx_name:"TFloat",_hx_index:2,__enum__:"ValueType",toString:$estr}
+	,TBool: {_hx_name:"TBool",_hx_index:3,__enum__:"ValueType",toString:$estr}
+	,TObject: {_hx_name:"TObject",_hx_index:4,__enum__:"ValueType",toString:$estr}
+	,TFunction: {_hx_name:"TFunction",_hx_index:5,__enum__:"ValueType",toString:$estr}
+	,TClass: ($_=function(c) { return {_hx_index:6,c:c,__enum__:"ValueType",toString:$estr}; },$_._hx_name="TClass",$_.__params__ = ["c"],$_)
+	,TEnum: ($_=function(e) { return {_hx_index:7,e:e,__enum__:"ValueType",toString:$estr}; },$_._hx_name="TEnum",$_.__params__ = ["e"],$_)
+	,TUnknown: {_hx_name:"TUnknown",_hx_index:8,__enum__:"ValueType",toString:$estr}
+};
+ValueType.__constructs__ = [ValueType.TNull,ValueType.TInt,ValueType.TFloat,ValueType.TBool,ValueType.TObject,ValueType.TFunction,ValueType.TClass,ValueType.TEnum,ValueType.TUnknown];
 var Type = function() { };
 Type.__name__ = "Type";
+Type.createInstance = function(cl,args) {
+	var ctor = Function.prototype.bind.apply(cl,[null].concat(args));
+	return new (ctor);
+};
 Type.getInstanceFields = function(c) {
 	var a = [];
 	for(var i in c.prototype) a.push(i);
@@ -485,8 +532,200 @@ Type.getInstanceFields = function(c) {
 	HxOverrides.remove(a,"__properties__");
 	return a;
 };
+Type.typeof = function(v) {
+	switch(typeof(v)) {
+	case "boolean":
+		return ValueType.TBool;
+	case "function":
+		if(v.__name__ || v.__ename__) {
+			return ValueType.TObject;
+		}
+		return ValueType.TFunction;
+	case "number":
+		if(Math.ceil(v) == v % 2147483648.0) {
+			return ValueType.TInt;
+		}
+		return ValueType.TFloat;
+	case "object":
+		if(v == null) {
+			return ValueType.TNull;
+		}
+		var e = v.__enum__;
+		if(e != null) {
+			return ValueType.TEnum($hxEnums[e]);
+		}
+		var c = js_Boot.getClass(v);
+		if(c != null) {
+			return ValueType.TClass(c);
+		}
+		return ValueType.TObject;
+	case "string":
+		return ValueType.TClass(String);
+	case "undefined":
+		return ValueType.TNull;
+	default:
+		return ValueType.TUnknown;
+	}
+};
 var auction_Server = function() { };
 auction_Server.__name__ = "auction.Server";
+var auction_server_GolgiExpressPath = {};
+auction_server_GolgiExpressPath._new = function(self) {
+	var this1 = self;
+	return this1;
+};
+auction_server_GolgiExpressPath.fromRequest = function(self) {
+	var arr = self.path.split("/");
+	arr.shift();
+	return auction_server_GolgiExpressPath._new(arr);
+};
+var auction_server_HandlerLift = function() { };
+auction_server_HandlerLift.__name__ = "auction.server.HandlerLift";
+auction_server_HandlerLift.apply = function(router,req,res,next) {
+	var path = auction_server_GolgiExpressPath.fromRequest(req);
+	try {
+		var operation = router.route(path,null,req);
+		if(operation._hx_index == 2) {
+			var _g = operation.result;
+			var home = "" + process.cwd() + "/templates/home.html";
+			haxe_Log.trace(home,{ fileName : "src/main/haxe/auction/server/Handler.hx", lineNumber : 20, className : "auction.server.HandlerLift", methodName : "apply"});
+			res.sendFile(home);
+		} else {
+			next();
+		}
+	} catch( _g ) {
+		haxe_NativeStackTrace.lastError = _g;
+		var _g1 = haxe_Exception.caught(_g).unwrap();
+		if(js_Boot.__instanceof(_g1,golgi_Error)) {
+			var e = _g1;
+			next(e);
+		} else {
+			throw _g;
+		}
+	}
+};
+var auction_server_Handler = {};
+auction_server_Handler._new = function(router) {
+	var router1 = router;
+	var this1 = function(req,res,next) {
+		auction_server_Handler._.apply(router1,req,res,next);
+	};
+	return this1;
+};
+var auction_server_Module = function() { };
+auction_server_Module.__name__ = "auction.server.Module";
+auction_server_Module.router = function() {
+	var root = new auction_server_router_Routes();
+	return new auction_server_router_Golgi(root);
+};
+var auction_server_api_ApiApi = function() { };
+auction_server_api_ApiApi.__name__ = "auction.server.api.ApiApi";
+auction_server_api_ApiApi.__isInterface__ = true;
+auction_server_api_ApiApi.prototype = {
+	user: null
+	,session: null
+	,auction: null
+	,saleable: null
+	,bid: null
+	,__class__: auction_server_api_ApiApi
+};
+var auction_server_api_ApiCls = function(user,session,auction,saleable,bid) {
+	this.user = user;
+	this.session = session;
+	this.auction = auction;
+	this.saleable = saleable;
+	this.bid = bid;
+};
+auction_server_api_ApiCls.__name__ = "auction.server.api.ApiCls";
+auction_server_api_ApiCls.__interfaces__ = [auction_server_api_ApiApi];
+auction_server_api_ApiCls.prototype = {
+	user: null
+	,session: null
+	,auction: null
+	,saleable: null
+	,bid: null
+	,__class__: auction_server_api_ApiCls
+};
+var auction_server_store_VO = function() { };
+auction_server_store_VO.__name__ = "auction.server.store.VO";
+auction_server_store_VO.prototype = {
+	uid: null
+	,get_uid: null
+	,__class__: auction_server_store_VO
+	,__properties__: {get_uid:"get_uid"}
+};
+var auction_server_auction_Auction = function(saleable,duration,start_time,bids,id) {
+	this.saleable = auction_server_saleable_SaleableId.toInt(saleable);
+	this.duration = duration;
+	this.start_time = start_time;
+	this.bids = bids;
+	this.id = id;
+};
+auction_server_auction_Auction.__name__ = "auction.server.auction.Auction";
+auction_server_auction_Auction.make = function(saleable,duration,start_time,bids,id) {
+	return new auction_server_auction_Auction(saleable,duration,start_time,bids,id);
+};
+auction_server_auction_Auction.__super__ = auction_server_store_VO;
+auction_server_auction_Auction.prototype = $extend(auction_server_store_VO.prototype,{
+	clone: function() {
+		return new cloner_Cloner().clone(this);
+	}
+	,stamp: function() {
+		if(this.start_time > 0) {
+			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/auction/Auction.hx", lineNumber : 18, className : "auction.server.auction.Auction", methodName : "stamp"});
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_AuctionFailed("already started"))),haxe_ds_Option.None,this1)));
+		} else {
+			var that = this.clone();
+			var hrtime = process.hrtime();
+			that.start_time = hrtime[0] + hrtime[1] / 1e9;
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,that));
+		}
+	}
+	,end_time: null
+	,get_end_time: function() {
+		var _gthis = this;
+		return stx_pico_OptionLift.map(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,this.start_time),function(f) {
+			return f + _gthis.duration;
+		});
+	}
+	,has_ended: function() {
+		var self = this.get_end_time();
+		switch(self._hx_index) {
+		case 0:
+			var t = self.v;
+			var hrtime = process.hrtime();
+			return hrtime[0] + hrtime[1] / 1e9 > t;
+		case 1:
+			return false;
+		}
+	}
+	,remaining_time: function() {
+		return stx_pico_OptionLift.map(this.get_end_time(),function(ok) {
+			var hrtime = process.hrtime();
+			return ok - (hrtime[0] + hrtime[1] / 1e9);
+		});
+	}
+	,saleable: null
+	,duration: null
+	,start_time: null
+	,bids: null
+	,id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_server_auction_Auction
+	,__properties__: $extend(auction_server_store_VO.prototype.__properties__,{get_end_time:"get_end_time"})
+});
+var auction_server_auction_AuctionId = {};
+auction_server_auction_AuctionId.toInt = function(this1) {
+	return this1;
+};
+auction_server_auction_AuctionId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_server_auction_AuctionId.toInt(_e);
+	}};
+};
 var stx_pico_Clazz = $hx_exports["stx"]["Clazz"] = function() {
 };
 stx_pico_Clazz.__name__ = "stx.pico.Clazz";
@@ -500,112 +739,29 @@ stx_pico_Clazz.prototype = {
 	}
 	,__class__: stx_pico_Clazz
 };
-var auction_User = function(name,id,bids) {
-	stx_pico_Clazz.call(this);
-	this.name = name;
-	this.id = id;
-	this.bids = bids;
-};
-auction_User.__name__ = "auction.User";
-auction_User.__super__ = stx_pico_Clazz;
-auction_User.prototype = $extend(stx_pico_Clazz.prototype,{
-	name: null
-	,id: null
-	,bids: null
-	,__class__: auction_User
-});
-var auction_Saleable = function() { };
-auction_Saleable.__name__ = "auction.Saleable";
-auction_Saleable.prototype = {
-	name: null
-	,id: null
-	,__class__: auction_Saleable
-};
-var auction_Bid = function() { };
-auction_Bid.__name__ = "auction.Bid";
-auction_Bid.prototype = {
-	user: null
-	,bid: null
-	,time: null
-	,item: null
-	,id: null
-	,__class__: auction_Bid
-};
-var auction_server_Module = function() { };
-auction_server_Module.__name__ = "auction.server.Module";
-auction_server_Module.router = function(context) {
-	var root = new auction_server_router_Routes(context);
-	return new auction_server_router_Golgi(root);
-};
-var auction_server_pack_ApiApi = function() { };
-auction_server_pack_ApiApi.__name__ = "auction.server.pack.ApiApi";
-auction_server_pack_ApiApi.prototype = {
-	auctions: null
-	,__class__: auction_server_pack_ApiApi
-};
-var auction_server_pack_Auction = function(start_time,duration,bids,item,id) {
-	this.start_time = start_time;
-	this.duration = duration;
-	this.bids = bids;
-	this.item = item;
-	this.id = id;
-};
-auction_server_pack_Auction.__name__ = "auction.server.pack.Auction";
-auction_server_pack_Auction.prototype = {
-	start_time: null
-	,duration: null
-	,bids: null
-	,item: null
-	,id: null
-	,__class__: auction_server_pack_Auction
-};
-var auction_server_pack_ModelApi = function() { };
-auction_server_pack_ModelApi.__name__ = "auction.server.pack.ModelApi";
-auction_server_pack_ModelApi.prototype = {
+var auction_server_store_StoreApi = function() { };
+auction_server_store_StoreApi.__name__ = "auction.server.store.StoreApi";
+auction_server_store_StoreApi.__isInterface__ = true;
+auction_server_store_StoreApi.prototype = {
 	insert: null
 	,update: null
 	,'delete': null
-	,__class__: auction_server_pack_ModelApi
+	,locate: null
+	,values: null
+	,__class__: auction_server_store_StoreApi
 };
-var auction_server_pack_AuctionModelApi = function() { };
-auction_server_pack_AuctionModelApi.__name__ = "auction.server.pack.AuctionModelApi";
-auction_server_pack_AuctionModelApi.__interfaces__ = [auction_server_pack_ModelApi];
-var auction_server_pack_BidModelApi = function() { };
-auction_server_pack_BidModelApi.__name__ = "auction.server.pack.BidModelApi";
-auction_server_pack_BidModelApi.__interfaces__ = [auction_server_pack_ModelApi];
-var auction_server_pack_BootstrapApi = function() {
-};
-auction_server_pack_BootstrapApi.__name__ = "auction.server.pack.BootstrapApi";
-auction_server_pack_BootstrapApi.__interfaces__ = [auction_server_pack_ApiApi];
-auction_server_pack_BootstrapApi.prototype = {
-	auctions: null
-	,__class__: auction_server_pack_BootstrapApi
-};
-var auction_server_pack_ContextApi = function() { };
-auction_server_pack_ContextApi.__name__ = "auction.server.pack.ContextApi";
-auction_server_pack_ContextApi.prototype = {
-	api: null
-	,__class__: auction_server_pack_ContextApi
-};
-var auction_server_pack_Context = function() {
-	this.api = new auction_server_pack_BootstrapApi();
-};
-auction_server_pack_Context.__name__ = "auction.server.pack.Context";
-auction_server_pack_Context.__interfaces__ = [auction_server_pack_ContextApi];
-auction_server_pack_Context.prototype = {
-	api: null
-	,__class__: auction_server_pack_Context
-};
-var auction_server_pack_MemoryModel = function() {
+var auction_server_store_MemoryStore = function() {
+	stx_pico_Clazz.call(this);
 	this.data = [];
 };
-auction_server_pack_MemoryModel.__name__ = "auction.server.pack.MemoryModel";
-auction_server_pack_MemoryModel.__interfaces__ = [auction_server_pack_ModelApi];
-auction_server_pack_MemoryModel.prototype = {
+auction_server_store_MemoryStore.__name__ = "auction.server.store.MemoryStore";
+auction_server_store_MemoryStore.__interfaces__ = [auction_server_store_StoreApi];
+auction_server_store_MemoryStore.__super__ = stx_pico_Clazz;
+auction_server_store_MemoryStore.prototype = $extend(stx_pico_Clazz.prototype,{
 	data: null
 	,insert: function(v) {
 		this.data.push(v);
-		return stx_nano_Pledge.pure(null);
+		return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,null));
 	}
 	,'delete': function(i) {
 		var value = stx_lift_ArrayLift.search(this.data,function(x) {
@@ -617,7 +773,7 @@ auction_server_pack_MemoryModel.prototype = {
 			var v1 = v.next();
 			removed = HxOverrides.remove(this.data,v1);
 		}
-		return stx_nano_Pledge.pure(removed);
+		return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,removed));
 	}
 	,update: function(v) {
 		var self = this.data;
@@ -637,18 +793,230 @@ auction_server_pack_MemoryModel.prototype = {
 		if(index1 != -1) {
 			this.data[index1] = v;
 		}
-		return stx_nano_Pledge.pure(null);
+		return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,null));
 	}
-	,__class__: auction_server_pack_MemoryModel
+	,locate: function(i) {
+		return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,stx_lift_ArrayLift.search(this.data,function(x) {
+			return x.id == i;
+		})));
+	}
+	,values: function() {
+		var _this = this.data;
+		var result = new Array(_this.length);
+		var _g = 0;
+		var _g1 = _this.length;
+		while(_g < _g1) {
+			var i = _g++;
+			result[i] = _this[i].id;
+		}
+		return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,result));
+	}
+	,toString: function() {
+		var c = js_Boot.getClass(this);
+		var name = stx_pico_Identifier.get_name(stx_pico_Identifier._new(c.__name__));
+		var _this = this.data;
+		var result = new Array(_this.length);
+		var _g = 0;
+		var _g1 = _this.length;
+		while(_g < _g1) {
+			var i = _g++;
+			result[i] = Std.string(_this[i]);
+		}
+		var data = result.join(", ");
+		return "" + name + "(" + data + ")";
+	}
+	,__class__: auction_server_store_MemoryStore
+});
+var auction_server_auction_AuctionModelApi = function() { };
+auction_server_auction_AuctionModelApi.__name__ = "auction.server.auction.AuctionModelApi";
+auction_server_auction_AuctionModelApi.__isInterface__ = true;
+auction_server_auction_AuctionModelApi.__interfaces__ = [auction_server_store_StoreApi];
+auction_server_auction_AuctionModelApi.prototype = {
+	start: null
+	,place_bid: null
+	,__class__: auction_server_auction_AuctionModelApi
 };
-var auction_server_pack_MemoryBidModel = function() {
-	auction_server_pack_MemoryModel.call(this);
+var auction_server_auction_AuctionMemoryModel = function(bids) {
+	auction_server_store_MemoryStore.call(this);
+	this.bids = bids;
 };
-auction_server_pack_MemoryBidModel.__name__ = "auction.server.pack.MemoryBidModel";
-auction_server_pack_MemoryBidModel.__interfaces__ = [auction_server_pack_BidModelApi];
-auction_server_pack_MemoryBidModel.__super__ = auction_server_pack_MemoryModel;
-auction_server_pack_MemoryBidModel.prototype = $extend(auction_server_pack_MemoryModel.prototype,{
-	__class__: auction_server_pack_MemoryBidModel
+auction_server_auction_AuctionMemoryModel.__name__ = "auction.server.auction.AuctionMemoryModel";
+auction_server_auction_AuctionMemoryModel.__interfaces__ = [auction_server_auction_AuctionModelApi];
+auction_server_auction_AuctionMemoryModel.make = function(bids) {
+	return new auction_server_auction_AuctionMemoryModel(bids);
+};
+auction_server_auction_AuctionMemoryModel.__super__ = auction_server_store_MemoryStore;
+auction_server_auction_AuctionMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
+	bids: null
+	,start: function(id) {
+		var _gthis = this;
+		return stx_nano_Pledge.flat_map(this.locate(auction_server_auction_AuctionId.toInt(id)),function(auction) {
+			var tmp;
+			switch(auction._hx_index) {
+			case 0:
+				var t = auction.v;
+				tmp = stx_nano_Pledge.flat_map(t.stamp(),function(auction) {
+					return _gthis.update(auction);
+				});
+				break;
+			case 1:
+				tmp = stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,null));
+				break;
+			}
+			return tmp;
+		});
+	}
+	,place_bid: function(id,bid) {
+		var _gthis = this;
+		return stx_nano_Pledge.flat_map(this.locate(auction_server_auction_AuctionId.toInt(id)),function(auction) {
+			var tmp;
+			switch(auction._hx_index) {
+			case 0:
+				var t = auction.v;
+				var ok = t;
+				tmp = stx_nano_Pledge.flat_map(_gthis.bids.insert(bid),function(_) {
+					var next = new cloner_Cloner().clone(ok);
+					next.bids.push(bid.get_uid());
+					return _gthis.update(next);
+				});
+				break;
+			case 1:
+				var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/auction/AuctionMemoryModel.hx", lineNumber : 35, className : "auction.server.auction.AuctionMemoryModel", methodName : "place_bid"});
+				tmp = stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_NoSuchAuction)),haxe_ds_Option.None,this1)));
+				break;
+			}
+			return tmp;
+		});
+	}
+	,__class__: auction_server_auction_AuctionMemoryModel
+});
+var auction_server_auction_AuctionSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_server_auction_AuctionSchema.__name__ = "auction.server.auction.AuctionSchema";
+auction_server_auction_AuctionSchema.__super__ = stx_pico_Clazz;
+auction_server_auction_AuctionSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	__class__: auction_server_auction_AuctionSchema
+});
+var auction_server_bid_Bid = function(user,item,bid,time,id) {
+	this.user = user;
+	this.item = item;
+	this.bid = bid;
+	this.time = time;
+	this.id = id;
+};
+auction_server_bid_Bid.__name__ = "auction.server.bid.Bid";
+auction_server_bid_Bid.__super__ = auction_server_store_VO;
+auction_server_bid_Bid.prototype = $extend(auction_server_store_VO.prototype,{
+	user: null
+	,item: null
+	,bid: null
+	,time: null
+	,id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_server_bid_Bid
+});
+var auction_server_bid_BidId = {};
+auction_server_bid_BidId.toInt = function(this1) {
+	return this1;
+};
+auction_server_bid_BidId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_server_bid_BidId.toInt(_e);
+	}};
+};
+var auction_server_bid_BidModelApi = function() { };
+auction_server_bid_BidModelApi.__name__ = "auction.server.bid.BidModelApi";
+auction_server_bid_BidModelApi.__isInterface__ = true;
+auction_server_bid_BidModelApi.__interfaces__ = [auction_server_store_StoreApi];
+var auction_server_bid_BidMemoryModel = function() {
+	auction_server_store_MemoryStore.call(this);
+};
+auction_server_bid_BidMemoryModel.__name__ = "auction.server.bid.BidMemoryModel";
+auction_server_bid_BidMemoryModel.__interfaces__ = [auction_server_bid_BidModelApi];
+auction_server_bid_BidMemoryModel.__super__ = auction_server_store_MemoryStore;
+auction_server_bid_BidMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
+	__class__: auction_server_bid_BidMemoryModel
+});
+var auction_server_pack_Counter = function() {
+	this.value = 0;
+};
+auction_server_pack_Counter.__name__ = "auction.server.pack.Counter";
+auction_server_pack_Counter.prototype = {
+	value: null
+	,next: function() {
+		var result = this.value;
+		this.value += 1;
+		return result;
+	}
+	,portion: function(length) {
+		var _gthis = this;
+		return { iterator : { next : function() {
+			length -= 1;
+			return _gthis.next();
+		}, hasNext : function() {
+			return length > 0;
+		}}};
+	}
+	,__class__: auction_server_pack_Counter
+};
+var auction_server_bid_BidSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_server_bid_BidSchema.__name__ = "auction.server.bid.BidSchema";
+auction_server_bid_BidSchema.__super__ = stx_pico_Clazz;
+auction_server_bid_BidSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	make: function(user,item,bid,time,id) {
+		var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,id);
+		var tmp;
+		if(self._hx_index == 0) {
+			var v = self.v;
+			tmp = v;
+		} else {
+			tmp = auction_server_bid_BidSchema.counter.next();
+		}
+		return new auction_server_bid_Bid(user,item,bid,time,tmp);
+	}
+	,__class__: auction_server_bid_BidSchema
+});
+var auction_server_context_ContextApi = function() { };
+auction_server_context_ContextApi.__name__ = "auction.server.context.ContextApi";
+auction_server_context_ContextApi.__isInterface__ = true;
+auction_server_context_ContextApi.prototype = {
+	api: null
+	,__class__: auction_server_context_ContextApi
+};
+var auction_server_context_ContextCls = function(api) {
+	this.api = api;
+};
+auction_server_context_ContextCls.__name__ = "auction.server.context.ContextCls";
+auction_server_context_ContextCls.__interfaces__ = [auction_server_context_ContextApi];
+auction_server_context_ContextCls.prototype = {
+	api: null
+	,__class__: auction_server_context_ContextCls
+};
+var auction_server_context_ContextSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_server_context_ContextSchema.__name__ = "auction.server.context.ContextSchema";
+auction_server_context_ContextSchema.__super__ = stx_pico_Clazz;
+auction_server_context_ContextSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	mock: function() {
+		var bid = new auction_server_bid_BidMemoryModel();
+		var session = new auction_server_session_SessionMemoryModel();
+		var user = new auction_server_user_UserSchema().pull(session);
+		var saleable = auction_server_saleable_SaleableMockMemoryModel.pull();
+		var auction = auction_server_auction_AuctionMemoryModel.make(bid);
+		var pull = function(user,saleable) {
+			return new auction_server_context_ContextCls(new auction_server_api_ApiCls(user,session,auction,saleable,bid));
+		};
+		var context = stx_nano_Pledge.map(stx_nano_PledgeLift.zip(user,saleable),stx_nano_lift_LiftNano.decouple(stx_nano_Wildcard.__,pull));
+		return context;
+	}
+	,__class__: auction_server_context_ContextSchema
 });
 var golgi_Golgi = function(api,meta) {
 	this.api = api;
@@ -684,14 +1052,27 @@ auction_server_router_Golgi.prototype = $extend(golgi_Golgi.prototype,{
 		this.dict.h["api"] = function(parts,params,request) {
 			return auction_server_router_Operation.Api(_gthis.api.api(request,new golgi_Subroute(parts.slice(1),params,request)));
 		};
+		this.dict.h["_404"] = function(parts,params,request) {
+			if(parts.length > 1) {
+				throw haxe_Exception.thrown(golgi_Error.TooManyValues);
+			}
+			return auction_server_router_Operation._404(_gthis.api._404());
+		};
+		this.dict.h[""] = function(parts,params,request) {
+			if(parts.length > 1) {
+				throw haxe_Exception.thrown(golgi_Error.TooManyValues);
+			}
+			return auction_server_router_Operation.Home(_gthis.api.home());
+		};
 	}
 	,__class__: auction_server_router_Golgi
 });
 var auction_server_router_Operation = $hxEnums["auction.server.router.Operation"] = { __ename__:true,__constructs__:null
-	,Context: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="Context",$_.__params__ = ["result"],$_)
-	,Api: ($_=function(result) { return {_hx_index:1,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="Api",$_.__params__ = ["result"],$_)
+	,Api: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="Api",$_.__params__ = ["result"],$_)
+	,_404: ($_=function(result) { return {_hx_index:1,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="_404",$_.__params__ = ["result"],$_)
+	,Home: ($_=function(result) { return {_hx_index:2,result:result,__enum__:"auction.server.router.Operation",toString:$estr}; },$_._hx_name="Home",$_.__params__ = ["result"],$_)
 };
-auction_server_router_Operation.__constructs__ = [auction_server_router_Operation.Context,auction_server_router_Operation.Api];
+auction_server_router_Operation.__constructs__ = [auction_server_router_Operation.Api,auction_server_router_Operation._404,auction_server_router_Operation.Home];
 auction_server_router_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
 var golgi_Api = function() {
 };
@@ -699,19 +1080,23 @@ golgi_Api.__name__ = "golgi.Api";
 golgi_Api.prototype = {
 	__class__: golgi_Api
 };
-var auction_server_router_Routes = function(context) {
+var auction_server_router_Routes = function() {
 	golgi_Api.call(this);
-	this.context = context;
 };
 auction_server_router_Routes.__name__ = "auction.server.router.Routes";
 auction_server_router_Routes.__super__ = golgi_Api;
 auction_server_router_Routes.prototype = $extend(golgi_Api.prototype,{
-	context: null
-	,api: function(request,subroute) {
-		var sub_api = new auction_server_router_api_Routes(this.context.api);
+	api: function(request,subroute) {
+		var sub_api = new auction_server_router_api_Routes();
 		var sub_glg = new auction_server_router_api_Golgi(sub_api);
 		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
 		return res;
+	}
+	,_404: function() {
+		return null;
+	}
+	,home: function() {
+		return null;
 	}
 	,__class__: auction_server_router_Routes
 });
@@ -722,24 +1107,623 @@ auction_server_router_api_Golgi.__name__ = "auction.server.router.api.Golgi";
 auction_server_router_api_Golgi.__super__ = golgi_Golgi;
 auction_server_router_api_Golgi.prototype = $extend(golgi_Golgi.prototype,{
 	__init: function() {
+		var _gthis = this;
+		this.dict.h["saleable"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Saleable(_gthis.api.saleable(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
+		this.dict.h["bid"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Bid(_gthis.api.bid(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
+		this.dict.h["auction"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Auction(_gthis.api.auction(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
+		this.dict.h["user"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.User(_gthis.api.user(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
+		this.dict.h["session"] = function(parts,params,request) {
+			return auction_server_router_api_Operation.Session(_gthis.api.session(request,new golgi_Subroute(parts.slice(1),params,request)));
+		};
 	}
 	,__class__: auction_server_router_api_Golgi
 });
 var auction_server_router_api_Operation = $hxEnums["auction.server.router.api.Operation"] = { __ename__:true,__constructs__:null
-	,Delegate: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Delegate",$_.__params__ = ["result"],$_)
+	,Saleable: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Saleable",$_.__params__ = ["result"],$_)
+	,Bid: ($_=function(result) { return {_hx_index:1,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Bid",$_.__params__ = ["result"],$_)
+	,Auction: ($_=function(result) { return {_hx_index:2,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Auction",$_.__params__ = ["result"],$_)
+	,User: ($_=function(result) { return {_hx_index:3,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="User",$_.__params__ = ["result"],$_)
+	,Session: ($_=function(result) { return {_hx_index:4,result:result,__enum__:"auction.server.router.api.Operation",toString:$estr}; },$_._hx_name="Session",$_.__params__ = ["result"],$_)
 };
-auction_server_router_api_Operation.__constructs__ = [auction_server_router_api_Operation.Delegate];
+auction_server_router_api_Operation.__constructs__ = [auction_server_router_api_Operation.Saleable,auction_server_router_api_Operation.Bid,auction_server_router_api_Operation.Auction,auction_server_router_api_Operation.User,auction_server_router_api_Operation.Session];
 auction_server_router_api_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
-var auction_server_router_api_Routes = function(delegate) {
+var auction_server_router_api_Routes = function() {
 	golgi_Api.call(this);
-	this.delegate = delegate;
 };
 auction_server_router_api_Routes.__name__ = "auction.server.router.api.Routes";
 auction_server_router_api_Routes.__super__ = golgi_Api;
 auction_server_router_api_Routes.prototype = $extend(golgi_Api.prototype,{
-	delegate: null
+	saleable: function(request,subroute) {
+		var sub_api = new auction_server_router_api_saleable_Routes();
+		var sub_glg = new auction_server_router_api_saleable_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,bid: function(request,subroute) {
+		var sub_api = new auction_server_router_api_bid_Routes();
+		var sub_glg = new auction_server_router_api_bid_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,auction: function(request,subroute) {
+		var sub_api = new auction_server_router_api_auction_Routes();
+		var sub_glg = new auction_server_router_api_auction_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,user: function(request,subroute) {
+		var sub_api = new auction_server_router_api_user_Routes();
+		var sub_glg = new auction_server_router_api_user_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
+	,session: function(request,subroute) {
+		var sub_api = new auction_server_router_api_session_Routes();
+		var sub_glg = new auction_server_router_api_session_Golgi(sub_api);
+		var res = sub_glg.route(subroute.parts,subroute.params,subroute.request);
+		return res;
+	}
 	,__class__: auction_server_router_api_Routes
 });
+var auction_server_router_api_auction_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_auction_Golgi.__name__ = "auction.server.router.api.auction.Golgi";
+auction_server_router_api_auction_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_auction_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+		var _gthis = this;
+		this.dict.h["start"] = function(parts,params,request) {
+			if(parts.length > 2) {
+				throw haxe_Exception.thrown(golgi_Error.TooManyValues);
+			}
+			return auction_server_router_api_auction_Operation.Start(_gthis.api.start(request));
+		};
+	}
+	,__class__: auction_server_router_api_auction_Golgi
+});
+var auction_server_router_api_auction_Operation = $hxEnums["auction.server.router.api.auction.Operation"] = { __ename__:true,__constructs__:null
+	,Start: ($_=function(result) { return {_hx_index:0,result:result,__enum__:"auction.server.router.api.auction.Operation",toString:$estr}; },$_._hx_name="Start",$_.__params__ = ["result"],$_)
+};
+auction_server_router_api_auction_Operation.__constructs__ = [auction_server_router_api_auction_Operation.Start];
+auction_server_router_api_auction_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_auction_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_auction_Routes.__name__ = "auction.server.router.api.auction.Routes";
+auction_server_router_api_auction_Routes.__super__ = golgi_Api;
+auction_server_router_api_auction_Routes.prototype = $extend(golgi_Api.prototype,{
+	start: function(request) {
+		haxe_Log.trace(request,{ fileName : "src/main/haxe/auction/server/router/api/auction/Routes.hx", lineNumber : 6, className : "auction.server.router.api.auction.Routes", methodName : "start"});
+		return 0;
+	}
+	,__class__: auction_server_router_api_auction_Routes
+});
+var auction_server_router_api_bid_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_bid_Golgi.__name__ = "auction.server.router.api.bid.Golgi";
+auction_server_router_api_bid_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_bid_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_bid_Golgi
+});
+var auction_server_router_api_bid_Operation = $hxEnums["auction.server.router.api.bid.Operation"] = { __ename__:true,__constructs__:null
+};
+auction_server_router_api_bid_Operation.__constructs__ = [];
+auction_server_router_api_bid_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_bid_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_bid_Routes.__name__ = "auction.server.router.api.bid.Routes";
+auction_server_router_api_bid_Routes.__super__ = golgi_Api;
+auction_server_router_api_bid_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_bid_Routes
+});
+var auction_server_router_api_saleable_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_saleable_Golgi.__name__ = "auction.server.router.api.saleable.Golgi";
+auction_server_router_api_saleable_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_saleable_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_saleable_Golgi
+});
+var auction_server_router_api_saleable_Operation = $hxEnums["auction.server.router.api.saleable.Operation"] = { __ename__:true,__constructs__:null
+};
+auction_server_router_api_saleable_Operation.__constructs__ = [];
+auction_server_router_api_saleable_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_saleable_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_saleable_Routes.__name__ = "auction.server.router.api.saleable.Routes";
+auction_server_router_api_saleable_Routes.__super__ = golgi_Api;
+auction_server_router_api_saleable_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_saleable_Routes
+});
+var auction_server_router_api_session_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_session_Golgi.__name__ = "auction.server.router.api.session.Golgi";
+auction_server_router_api_session_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_session_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_session_Golgi
+});
+var auction_server_router_api_session_Operation = $hxEnums["auction.server.router.api.session.Operation"] = { __ename__:true,__constructs__:null
+};
+auction_server_router_api_session_Operation.__constructs__ = [];
+auction_server_router_api_session_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_session_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_session_Routes.__name__ = "auction.server.router.api.session.Routes";
+auction_server_router_api_session_Routes.__super__ = golgi_Api;
+auction_server_router_api_session_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_session_Routes
+});
+var auction_server_router_api_user_Golgi = function(api,meta) {
+	golgi_Golgi.call(this,api,meta);
+};
+auction_server_router_api_user_Golgi.__name__ = "auction.server.router.api.user.Golgi";
+auction_server_router_api_user_Golgi.__super__ = golgi_Golgi;
+auction_server_router_api_user_Golgi.prototype = $extend(golgi_Golgi.prototype,{
+	__init: function() {
+	}
+	,__class__: auction_server_router_api_user_Golgi
+});
+var auction_server_router_api_user_Operation = $hxEnums["auction.server.router.api.user.Operation"] = { __ename__:true,__constructs__:null
+};
+auction_server_router_api_user_Operation.__constructs__ = [];
+auction_server_router_api_user_Operation.__meta__ = { obj : { _golgi_api : ["Routes"]}};
+var auction_server_router_api_user_Routes = function() {
+	golgi_Api.call(this);
+};
+auction_server_router_api_user_Routes.__name__ = "auction.server.router.api.user.Routes";
+auction_server_router_api_user_Routes.__super__ = golgi_Api;
+auction_server_router_api_user_Routes.prototype = $extend(golgi_Api.prototype,{
+	__class__: auction_server_router_api_user_Routes
+});
+var auction_server_saleable_Saleable = function(name,description,img,id) {
+	this.name = name;
+	this.description = description;
+	this.img = img;
+	this.id = id;
+};
+auction_server_saleable_Saleable.__name__ = "auction.server.saleable.Saleable";
+auction_server_saleable_Saleable.make = function(name,description,img,id) {
+	return new auction_server_saleable_Saleable(name,description,img,id);
+};
+auction_server_saleable_Saleable.__super__ = auction_server_store_VO;
+auction_server_saleable_Saleable.prototype = $extend(auction_server_store_VO.prototype,{
+	name: null
+	,description: null
+	,img: null
+	,id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_server_saleable_Saleable
+});
+var auction_server_saleable_SaleableId = {};
+auction_server_saleable_SaleableId.toInt = function(this1) {
+	return this1;
+};
+auction_server_saleable_SaleableId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_server_saleable_SaleableId.toInt(_e);
+	}};
+};
+var auction_server_saleable_SaleableModelApi = function() { };
+auction_server_saleable_SaleableModelApi.__name__ = "auction.server.saleable.SaleableModelApi";
+auction_server_saleable_SaleableModelApi.__isInterface__ = true;
+auction_server_saleable_SaleableModelApi.__interfaces__ = [auction_server_store_StoreApi];
+var auction_server_saleable_SaleableMemoryModel = function() {
+	auction_server_store_MemoryStore.call(this);
+};
+auction_server_saleable_SaleableMemoryModel.__name__ = "auction.server.saleable.SaleableMemoryModel";
+auction_server_saleable_SaleableMemoryModel.__interfaces__ = [auction_server_saleable_SaleableModelApi];
+auction_server_saleable_SaleableMemoryModel.__super__ = auction_server_store_MemoryStore;
+auction_server_saleable_SaleableMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
+	__class__: auction_server_saleable_SaleableMemoryModel
+});
+var auction_server_saleable_SaleableMockMemoryModel = function() {
+	auction_server_saleable_SaleableMemoryModel.call(this);
+};
+auction_server_saleable_SaleableMockMemoryModel.__name__ = "auction.server.saleable.SaleableMockMemoryModel";
+auction_server_saleable_SaleableMockMemoryModel.pull = function() {
+	var model = new auction_server_saleable_SaleableMockMemoryModel();
+	if(!stx_nano_Resource.exists("saleables")) {
+		var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/saleable/SaleableMockMemoryModel.hx", lineNumber : 8, className : "auction.server.saleable.SaleableMockMemoryModel", methodName : "pull"});
+		throw haxe_Exception.thrown(new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF("E_ResourceNotFound")),haxe_ds_Option.None,this1));
+	}
+	var this1 = "saleables";
+	var resource = JSON.parse(stx_nano_Resource.string(this1));
+	var data = [];
+	var _g = 0;
+	var _g1 = resource.data;
+	while(_g < _g1.length) {
+		var item = _g1[_g];
+		++_g;
+		var next = auction_server_saleable_Saleable.make(item.name,item.description,item.img,item.id);
+		data.push(next);
+	}
+	var fn = function(next,memo) {
+		return stx_nano_Pledge.map(model.insert(next),function(_) {
+			return memo;
+		});
+	};
+	return stx_nano_Pledge.bind_fold(data,fn,model);
+};
+auction_server_saleable_SaleableMockMemoryModel.__super__ = auction_server_saleable_SaleableMemoryModel;
+auction_server_saleable_SaleableMockMemoryModel.prototype = $extend(auction_server_saleable_SaleableMemoryModel.prototype,{
+	__class__: auction_server_saleable_SaleableMockMemoryModel
+});
+var auction_server_session_Session = function(id,start_time,user) {
+	this.id = auction_server_session_SessionId.toInt(id);
+	this.start_time = start_time;
+	this.user = auction_server_user_UserId.toInt(user);
+};
+auction_server_session_Session.__name__ = "auction.server.session.Session";
+auction_server_session_Session.pure = function(id) {
+	var tmp = auction_server_session_Session.counter.next();
+	var hrtime = process.hrtime();
+	return new auction_server_session_Session(tmp,hrtime[0] + hrtime[1] / 1e9,id);
+};
+auction_server_session_Session.__super__ = auction_server_store_VO;
+auction_server_session_Session.prototype = $extend(auction_server_store_VO.prototype,{
+	id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,user: null
+	,start_time: null
+	,__class__: auction_server_session_Session
+});
+var auction_server_session_SessionId = {};
+auction_server_session_SessionId.toInt = function(this1) {
+	return this1;
+};
+auction_server_session_SessionId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_server_session_SessionId.toInt(_e);
+	}};
+};
+var auction_server_session_SessionModelApi = function() { };
+auction_server_session_SessionModelApi.__name__ = "auction.server.session.SessionModelApi";
+auction_server_session_SessionModelApi.__isInterface__ = true;
+auction_server_session_SessionModelApi.__interfaces__ = [auction_server_store_StoreApi];
+var auction_server_session_SessionMemoryModel = function() {
+	auction_server_store_MemoryStore.call(this);
+};
+auction_server_session_SessionMemoryModel.__name__ = "auction.server.session.SessionMemoryModel";
+auction_server_session_SessionMemoryModel.__interfaces__ = [auction_server_session_SessionModelApi];
+auction_server_session_SessionMemoryModel.__super__ = auction_server_store_MemoryStore;
+auction_server_session_SessionMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
+	__class__: auction_server_session_SessionMemoryModel
+});
+var auction_server_session_SessionSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_server_session_SessionSchema.__name__ = "auction.server.session.SessionSchema";
+auction_server_session_SessionSchema.__super__ = stx_pico_Clazz;
+auction_server_session_SessionSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	mock_memory: function() {
+		return new auction_server_session_SessionMemoryModel();
+	}
+	,create: function(user) {
+		var tmp = auction_server_session_SessionSchema.counter.next();
+		var hrtime = process.hrtime();
+		return new auction_server_session_Session(tmp,hrtime[0] + hrtime[1] / 1e9,user);
+	}
+	,__class__: auction_server_session_SessionSchema
+});
+var auction_server_user_User = function(name,pass,id,role,bids,sessions) {
+	this.name = name;
+	this.pass = pass;
+	this.role = role;
+	this.id = id;
+	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,bids);
+	var tmp;
+	if(self._hx_index == 0) {
+		var v = self.v;
+		tmp = v;
+	} else {
+		tmp = [];
+	}
+	this.bids = tmp;
+	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,sessions);
+	var tmp;
+	if(self._hx_index == 0) {
+		var v = self.v;
+		tmp = v;
+	} else {
+		tmp = [];
+	}
+	this.sessions = tmp;
+};
+auction_server_user_User.__name__ = "auction.server.user.User";
+auction_server_user_User.__super__ = auction_server_store_VO;
+auction_server_user_User.prototype = $extend(auction_server_store_VO.prototype,{
+	clone: function() {
+		return new cloner_Cloner().clone(this);
+	}
+	,id: null
+	,name: null
+	,pass: null
+	,bids: null
+	,sessions: null
+	,role: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_server_user_User
+});
+var auction_server_user_UserId = {};
+auction_server_user_UserId.toInt = function(this1) {
+	return this1;
+};
+auction_server_user_UserId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_server_user_UserId.toInt(_e);
+	}};
+};
+var auction_server_user_UserModelApi = function() { };
+auction_server_user_UserModelApi.__name__ = "auction.server.user.UserModelApi";
+auction_server_user_UserModelApi.__isInterface__ = true;
+auction_server_user_UserModelApi.__interfaces__ = [auction_server_store_StoreApi];
+auction_server_user_UserModelApi.prototype = {
+	sign_in: null
+	,__class__: auction_server_user_UserModelApi
+};
+var auction_server_user_UserMockMemoryModel = function(session) {
+	auction_server_store_MemoryStore.call(this);
+	this.session = session;
+};
+auction_server_user_UserMockMemoryModel.__name__ = "auction.server.user.UserMockMemoryModel";
+auction_server_user_UserMockMemoryModel.__interfaces__ = [auction_server_user_UserModelApi];
+auction_server_user_UserMockMemoryModel.__super__ = auction_server_store_MemoryStore;
+auction_server_user_UserMockMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
+	session: null
+	,sign_in: function(credentials) {
+		var _gthis = this;
+		var user = stx_lift_ArrayLift.search(this.data,function(user) {
+			return user.name == credentials.name;
+		});
+		var pass;
+		switch(user._hx_index) {
+		case 0:
+			var t = user.v;
+			pass = t.pass == credentials.pass;
+			break;
+		case 1:
+			pass = false;
+			break;
+		}
+		return stx_nano_lift_LiftNano.if_else(pass,function() {
+			var u = stx_pico_OptionLift.fudge(user);
+			var s = auction_server_session_Session.pure(u.get_uid());
+			return stx_nano_Pledge.flat_map(_gthis.session.insert(s),function(_) {
+				var next = u.clone();
+				next.sessions.push(s.get_uid());
+				return stx_nano_Pledge.map(_gthis.update(u),function(_) {
+					return true;
+				});
+			});
+		},function() {
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,false));
+		});
+	}
+	,__class__: auction_server_user_UserMockMemoryModel
+});
+var auction_server_user_UserSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_server_user_UserSchema.__name__ = "auction.server.user.UserSchema";
+auction_server_user_UserSchema.__super__ = stx_pico_Clazz;
+auction_server_user_UserSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	make: function(name,pass,id,role,bids,sessions) {
+		return new auction_server_user_User(name,pass,id,role,bids,sessions);
+	}
+	,mock: function() {
+		var users = [];
+		if(!stx_nano_Resource.exists("users")) {
+			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/user/UserSchema.hx", lineNumber : 9, className : "auction.server.user.UserSchema", methodName : "mock"});
+			throw haxe_Exception.thrown(new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF("E_ResourceNotFound")),haxe_ds_Option.None,this1));
+		}
+		var this1 = "users";
+		var input = JSON.parse(stx_nano_Resource.string(this1)).data;
+		var _g = 0;
+		while(_g < input.length) {
+			var x = input[_g];
+			++_g;
+			var data = new auction_server_user_User(x.name,x.pass,x.id,x.role,[],[]);
+			users.push(data);
+		}
+		return users;
+	}
+	,pull: function(session) {
+		var users = this.mock();
+		var collection = new auction_server_user_UserMockMemoryModel(session);
+		return stx_nano_Pledge.bind_fold(users,function(next,memo) {
+			return stx_nano_Pledge.map(collection.insert(next),function(_) {
+				return collection;
+			});
+		},collection);
+	}
+	,__class__: auction_server_user_UserSchema
+});
+var auction_server_ws_HandlerLift = function() { };
+auction_server_ws_HandlerLift.__name__ = "auction.server.ws.HandlerLift";
+var auction_server_ws_Handler = {};
+auction_server_ws_Handler._new = function(router) {
+	var this1 = function(ws,req,next) {
+		haxe_Log.trace(req,{ fileName : "src/main/haxe/auction/server/ws/Handler.hx", lineNumber : 9, className : "auction.server.ws._Handler.Handler_Impl_", methodName : "_new"});
+		var path = auction_server_GolgiExpressPath.fromRequest(req);
+		try {
+			var operation = router.route(path,null,req);
+		} catch( _g ) {
+			haxe_NativeStackTrace.lastError = _g;
+			var _g1 = haxe_Exception.caught(_g).unwrap();
+			if(js_Boot.__instanceof(_g1,golgi_Error)) {
+				var e = _g1;
+				next(e);
+			} else {
+				throw _g;
+			}
+		}
+	};
+	return this1;
+};
+auction_server_ws_Handler.toWebsocketRequestHandler = function(this1) {
+	return this1;
+};
+var auction_server_ws_Module = function() { };
+auction_server_ws_Module.__name__ = "auction.server.ws.Module";
+auction_server_ws_Module.router = function() {
+	var root = new auction_server_router_api_Routes();
+	return new auction_server_router_api_Golgi(root);
+};
+var cloner_Cloner = function() {
+	this.stringMapCloner = new cloner_MapCloner(this,haxe_ds_StringMap);
+	this.intMapCloner = new cloner_MapCloner(this,haxe_ds_IntMap);
+	this.classHandles = new haxe_ds_StringMap();
+	this.classHandles.h["String"] = $bind(this,this.returnString);
+	this.classHandles.h["Array"] = $bind(this,this.cloneArray);
+	this.classHandles.h["haxe.ds.StringMap"] = ($_=this.stringMapCloner,$bind($_,$_.clone));
+	this.classHandles.h["haxe.ds.IntMap"] = ($_=this.intMapCloner,$bind($_,$_.clone));
+};
+cloner_Cloner.__name__ = "cloner.Cloner";
+cloner_Cloner.prototype = {
+	cache: null
+	,classHandles: null
+	,stringMapCloner: null
+	,intMapCloner: null
+	,returnString: function(v) {
+		return v;
+	}
+	,clone: function(v) {
+		this.cache = new haxe_ds_ObjectMap();
+		var outcome = this._clone(v);
+		this.cache = null;
+		return outcome;
+	}
+	,_clone: function(v) {
+		if(typeof(v) == "string") {
+			return v;
+		}
+		if(v.__name__ != null) {
+			return v;
+		}
+		var _g = Type.typeof(v);
+		switch(_g._hx_index) {
+		case 0:
+			return null;
+		case 1:
+			return v;
+		case 2:
+			return v;
+		case 3:
+			return v;
+		case 4:
+			return this.handleAnonymous(v);
+		case 5:
+			return null;
+		case 6:
+			var c = _g.c;
+			if(this.cache.h.__keys__[v.__id__] == null) {
+				this.cache.set(v,this.handleClass(c,v));
+			}
+			return this.cache.h[v.__id__];
+		case 7:
+			var e = _g.e;
+			return v;
+		case 8:
+			return null;
+		}
+	}
+	,handleAnonymous: function(v) {
+		var properties = Reflect.fields(v);
+		var anonymous = { };
+		var _g = 0;
+		var _g1 = properties.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var property = properties[i];
+			anonymous[property] = this._clone(Reflect.getProperty(v,property));
+		}
+		return anonymous;
+	}
+	,handleClass: function(c,inValue) {
+		var this1 = this.classHandles;
+		var key = c.__name__;
+		var handle = this1.h[key];
+		if(handle == null) {
+			handle = $bind(this,this.cloneClass);
+		}
+		return handle(inValue);
+	}
+	,cloneArray: function(inValue) {
+		var array = inValue.slice();
+		var _g = 0;
+		var _g1 = array.length;
+		while(_g < _g1) {
+			var i = _g++;
+			array[i] = this._clone(array[i]);
+		}
+		return array;
+	}
+	,cloneClass: function(inValue) {
+		var outValue = Object.create(js_Boot.getClass(inValue).prototype);
+		var fields = Reflect.fields(inValue);
+		var _g = 0;
+		var _g1 = fields.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var field = fields[i];
+			var property = Reflect.getProperty(inValue,field);
+			outValue[field] = this._clone(property);
+		}
+		return outValue;
+	}
+	,__class__: cloner_Cloner
+};
+var cloner_MapCloner = function(cloner,type) {
+	this.cloner = cloner;
+	this.type = type;
+	this.noArgs = [];
+};
+cloner_MapCloner.__name__ = "cloner.MapCloner";
+cloner_MapCloner.prototype = {
+	cloner: null
+	,type: null
+	,noArgs: null
+	,clone: function(inValue) {
+		var inMap = inValue;
+		var map = Type.createInstance(this.type,this.noArgs);
+		var key = inMap.keys();
+		while(key.hasNext()) {
+			var key1 = key.next();
+			map.set(key1,this.cloner._clone(inMap.get(key1)));
+		}
+		return map;
+	}
+	,__class__: cloner_MapCloner
+};
 var golgi_Error = $hxEnums["golgi.Error"] = { __ename__:true,__constructs__:null
 	,NotFound: ($_=function(path) { return {_hx_index:0,path:path,__enum__:"golgi.Error",toString:$estr}; },$_._hx_name="NotFound",$_.__params__ = ["path"],$_)
 	,InvalidValue: ($_=function(name) { return {_hx_index:1,name:name,__enum__:"golgi.Error",toString:$estr}; },$_._hx_name="InvalidValue",$_.__params__ = ["name"],$_)
@@ -966,8 +1950,11 @@ haxe_CallStack.itemToString = function(b,s) {
 };
 var haxe_IMap = function() { };
 haxe_IMap.__name__ = "haxe.IMap";
+haxe_IMap.__isInterface__ = true;
 haxe_IMap.prototype = {
-	set: null
+	get: null
+	,set: null
+	,keys: null
 	,__class__: haxe_IMap
 };
 var haxe_Exception = function(message,previous,native) {
@@ -1050,6 +2037,7 @@ haxe_Exception.prototype = $extend(Error.prototype,{
 		}
 	}
 	,__class__: haxe_Exception
+	,__properties__: {get_native:"get_native",get_stack:"get_stack"}
 });
 var haxe_Log = function() { };
 haxe_Log.__name__ = "haxe.Log";
@@ -1477,6 +2465,26 @@ var haxe_ds_Either = $hxEnums["haxe.ds.Either"] = { __ename__:true,__constructs_
 	,Right: ($_=function(v) { return {_hx_index:1,v:v,__enum__:"haxe.ds.Either",toString:$estr}; },$_._hx_name="Right",$_.__params__ = ["v"],$_)
 };
 haxe_ds_Either.__constructs__ = [haxe_ds_Either.Left,haxe_ds_Either.Right];
+var haxe_ds_IntMap = function() {
+	this.h = { };
+};
+haxe_ds_IntMap.__name__ = "haxe.ds.IntMap";
+haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
+haxe_ds_IntMap.prototype = {
+	h: null
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) if(this.h.hasOwnProperty(key)) a.push(key | 0);
+		return new haxe_iterators_ArrayIterator(a);
+	}
+	,__class__: haxe_ds_IntMap
+};
 var haxe_ds_List = function() {
 	this.length = 0;
 };
@@ -1541,6 +2549,18 @@ haxe_ds_ObjectMap.prototype = {
 		this.h[id] = value;
 		this.h.__keys__[id] = key;
 	}
+	,get: function(key) {
+		return this.h[key.__id__];
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h.__keys__ ) {
+		if(this.h.hasOwnProperty(key)) {
+			a.push(this.h.__keys__[key]);
+		}
+		}
+		return new haxe_iterators_ArrayIterator(a);
+	}
 	,__class__: haxe_ds_ObjectMap
 };
 var haxe_ds_Option = $hxEnums["haxe.ds.Option"] = { __ename__:true,__constructs__:null
@@ -1555,10 +2575,36 @@ haxe_ds_StringMap.__name__ = "haxe.ds.StringMap";
 haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
 haxe_ds_StringMap.prototype = {
 	h: null
+	,get: function(key) {
+		return this.h[key];
+	}
 	,set: function(key,value) {
 		this.h[key] = value;
 	}
+	,keys: function() {
+		return new haxe_ds__$StringMap_StringMapKeyIterator(this.h);
+	}
 	,__class__: haxe_ds_StringMap
+};
+var haxe_ds__$StringMap_StringMapKeyIterator = function(h) {
+	this.h = h;
+	this.keys = Object.keys(h);
+	this.length = this.keys.length;
+	this.current = 0;
+};
+haxe_ds__$StringMap_StringMapKeyIterator.__name__ = "haxe.ds._StringMap.StringMapKeyIterator";
+haxe_ds__$StringMap_StringMapKeyIterator.prototype = {
+	h: null
+	,keys: null
+	,length: null
+	,current: null
+	,hasNext: function() {
+		return this.current < this.length;
+	}
+	,next: function() {
+		return this.keys[this.current++];
+	}
+	,__class__: haxe_ds__$StringMap_StringMapKeyIterator
 };
 var haxe_io_Error = $hxEnums["haxe.io.Error"] = { __ename__:true,__constructs__:null
 	,Blocked: {_hx_name:"Blocked",_hx_index:0,__enum__:"haxe.io.Error",toString:$estr}
@@ -1939,6 +2985,62 @@ js_Boot.__interfLoop = function(cc,cl) {
 	}
 	return js_Boot.__interfLoop(cc.__super__,cl);
 };
+js_Boot.__instanceof = function(o,cl) {
+	if(cl == null) {
+		return false;
+	}
+	switch(cl) {
+	case Array:
+		return ((o) instanceof Array);
+	case Bool:
+		return typeof(o) == "boolean";
+	case Dynamic:
+		return o != null;
+	case Float:
+		return typeof(o) == "number";
+	case Int:
+		if(typeof(o) == "number") {
+			return ((o | 0) === o);
+		} else {
+			return false;
+		}
+		break;
+	case String:
+		return typeof(o) == "string";
+	default:
+		if(o != null) {
+			if(typeof(cl) == "function") {
+				if(js_Boot.__downcastCheck(o,cl)) {
+					return true;
+				}
+			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
+				if(((o) instanceof cl)) {
+					return true;
+				}
+			}
+		} else {
+			return false;
+		}
+		if(cl == Class ? o.__name__ != null : false) {
+			return true;
+		}
+		if(cl == Enum ? o.__ename__ != null : false) {
+			return true;
+		}
+		return o.__enum__ != null ? $hxEnums[o.__enum__] == cl : false;
+	}
+};
+js_Boot.__downcastCheck = function(o,cl) {
+	if(!((o) instanceof cl)) {
+		if(cl.__isInterface__) {
+			return js_Boot.__interfLoop(js_Boot.getClass(o),cl);
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
+};
 js_Boot.__implements = function(o,iface) {
 	return js_Boot.__interfLoop(js_Boot.getClass(o),iface);
 };
@@ -1948,6 +3050,9 @@ js_Boot.__nativeClassName = function(o) {
 		return null;
 	}
 	return name;
+};
+js_Boot.__isNativeObj = function(o) {
+	return js_Boot.__nativeClassName(o) != null;
 };
 js_Boot.__resolveNativeClass = function(name) {
 	return $global[name];
@@ -1962,6 +3067,7 @@ js_node_stream_WritableNewOptionsAdapter.from = function(options) {
 	return options;
 };
 var js_node_url_URLSearchParamsEntry = {};
+js_node_url_URLSearchParamsEntry.__properties__ = {get_value:"get_value",get_name:"get_name"};
 js_node_url_URLSearchParamsEntry._new = function(name,value) {
 	var this1 = [name,value];
 	return this1;
@@ -1996,8 +3102,12 @@ stx_LiftLazyFutureToSlot.toSlot = function(fn) {
 	return stx_nano_Slot.Guard(fn(),{ fileName : "stx/Nano.hx", lineNumber : 89, className : "stx.LiftLazyFutureToSlot", methodName : "toSlot"});
 };
 var stx_fail_AuctionFailure = $hxEnums["stx.fail.AuctionFailure"] = { __ename__:true,__constructs__:null
+	,E_AuctionFailed: ($_=function(str) { return {_hx_index:0,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_AuctionFailed",$_.__params__ = ["str"],$_)
+	,E_AuctionEnded: {_hx_name:"E_AuctionEnded",_hx_index:1,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_NoSuchAuction: {_hx_name:"E_NoSuchAuction",_hx_index:2,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_Golgi_Error: ($_=function(error) { return {_hx_index:3,error:error,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Golgi_Error",$_.__params__ = ["error"],$_)
 };
-stx_fail_AuctionFailure.__constructs__ = [];
+stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.E_AuctionFailed,stx_fail_AuctionFailure.E_AuctionEnded,stx_fail_AuctionFailure.E_NoSuchAuction,stx_fail_AuctionFailure.E_Golgi_Error];
 var stx_lift_ArrayLift = function() { };
 stx_lift_ArrayLift.__name__ = "stx.lift.ArrayLift";
 stx_lift_ArrayLift.flatten = function(arrs) {
@@ -2830,6 +3940,7 @@ stx_nano_Err.prototype = {
 		});
 	}
 	,__class__: stx_nano_Err
+	,__properties__: {get_uuid:"get_uuid"}
 };
 var stx_nano_FailCode = {};
 stx_nano_FailCode._new = function(self) {
@@ -2872,6 +3983,7 @@ stx_nano_FailureLift.toString = function(self) {
 	});
 };
 var stx_nano_Failure = {};
+stx_nano_Failure.__properties__ = {get_self:"get_self"};
 stx_nano_Failure._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -3120,12 +4232,17 @@ stx_nano__$Module_Ft.prototype = $extend(stx_pico_Clazz.prototype,{
 		},new tink_core__$Future_SyncFuture(new tink_core__$Lazy_LazyConst(init)));
 	}
 	,zip: function(self,that) {
-		var done = false;
 		var left = haxe_ds_Option.None;
 		var right = haxe_ds_Option.None;
 		var trigger = new tink_core_FutureTrigger();
 		var on_done = function() {
-			var on_done = left._hx_index == 0;
+			if(left._hx_index == 0) {
+				if(right._hx_index == 0) {
+					var r = right.v;
+					var l = left.v;
+					trigger.trigger(stx_nano_lift_LiftNano.couple(stx_nano_Wildcard.__,l,r));
+				}
+			}
 		};
 		var l_handler = function(l) {
 			left = haxe_ds_Option.Some(l);
@@ -3265,13 +4382,13 @@ stx_nano_PledgeLift.receive = function(self,fn) {
 		return tmp;
 	});
 };
-stx_nano_PledgeLift.now = function(self) {
+stx_nano_PledgeLift.fudge = function(self) {
 	var out = null;
 	stx_nano_Pledge.prj(self).handle(function(v) {
 		out = v;
 	});
 	if(out == null) {
-		throw haxe_Exception.thrown(new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_ValueNotReady")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 148, className : "stx.nano.PledgeLift", methodName : "now"})));
+		throw haxe_Exception.thrown(new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_ValueNotReady")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 158, className : "stx.nano.PledgeLift", methodName : "fudge"})));
 	}
 	return out;
 };
@@ -3292,6 +4409,7 @@ stx_nano_PledgeLift.errata = function(fn,self) {
 	});
 };
 var stx_nano_Pledge = {};
+stx_nano_Pledge.__properties__ = {get_self:"get_self"};
 stx_nano_Pledge._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -3300,21 +4418,24 @@ stx_nano_Pledge.lift = function(self) {
 	return stx_nano_Pledge._new(self);
 };
 stx_nano_Pledge.make = function(ch) {
-	return tink_core_Future.irreversible(function(f) {
+	var this1 = new tink_core__$Future_SuspendableFuture(function(f) {
 		f(ch);
+		return null;
 	});
+	return this1;
 };
-stx_nano_Pledge.pure = function(ch) {
-	return tink_core_Future.irreversible(function(f) {
-		f(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,ch));
-	});
+stx_nano_Pledge.accept = function(ch) {
+	return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,ch));
 };
-stx_nano_Pledge.bind_fold = function(it,start,fm) {
+stx_nano_Pledge.reject = function(e) {
+	return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,e));
+};
+stx_nano_Pledge.bind_fold = function(it,fm,start) {
 	return stx_nano_Pledge._new(stx_nano_lift_LiftNano.nano(stx_nano_Wildcard.__).Ft().bind_fold(it,function(next,memo) {
 		switch(memo._hx_index) {
 		case 0:
 			var t = memo.t;
-			return stx_nano_Pledge.prj(fm(t,next));
+			return stx_nano_Pledge.prj(fm(next,t));
 		case 1:
 			var e = memo.e;
 			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,e));
@@ -3364,7 +4485,7 @@ stx_nano_Pledge.fromOption = function(m) {
 		val = stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,t);
 		break;
 	case 1:
-		val = stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_UnexpectedNullValueEncountered")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 72, className : "stx.nano._Pledge.Pledge_Impl_", methodName : "fromOption"})));
+		val = stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_UnexpectedNullValueEncountered")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 73, className : "stx.nano._Pledge.Pledge_Impl_", methodName : "fromOption"})));
 		break;
 	}
 	var val1 = val;
@@ -3375,6 +4496,12 @@ stx_nano_Pledge.prj = function(this1) {
 };
 stx_nano_Pledge.get_self = function(this1) {
 	return stx_nano_Pledge.lift(this1);
+};
+stx_nano_Pledge.map = function(this1,fn) {
+	return stx_nano_Pledge._.map(this1,fn);
+};
+stx_nano_Pledge.flat_map = function(this1,fn) {
+	return stx_nano_Pledge._.flat_map(this1,fn);
 };
 var stx_nano_PositionLift = function() { };
 stx_nano_PositionLift.__name__ = "stx.nano.PositionLift";
@@ -3433,6 +4560,7 @@ stx_nano_PositionLift.identifier = function(self) {
 	return stx_pico_Identifier._new(valid);
 };
 var stx_nano_Position = {};
+stx_nano_Position.__properties__ = {get_customParams:"get_customParams",get_lineNummber:"get_lineNummber",get_methodName:"get_methodName",get_className:"get_className",get_fileName:"get_fileName"};
 stx_nano_Position._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -3974,6 +5102,7 @@ stx_nano_ResLift.ok = function(self) {
 	}
 };
 var stx_nano_Res = {};
+stx_nano_Res.__properties__ = {get_self:"get_self"};
 stx_nano_Res._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -4185,6 +5314,7 @@ stx_nano_SlotLift.zip = function(self,that) {
 	}
 };
 var stx_nano_Slot = {};
+stx_nano_Slot.__properties__ = {get_self:"get_self"};
 stx_nano_Slot._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -4289,6 +5419,7 @@ stx_nano_Triple.toString = function(this1) {
 	return stx_nano_TripleLift.toString(this1);
 };
 var stx_nano_Unique = {};
+stx_nano_Unique.__properties__ = {get_self:"get_self"};
 stx_nano_Unique._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -4688,6 +5819,7 @@ stx_pico_Either.prj = function(this1) {
 	return this1;
 };
 var stx_pico_Identifier = {};
+stx_pico_Identifier.__properties__ = {get_pack:"get_pack",get_name:"get_name"};
 stx_pico_Identifier._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -4974,6 +6106,7 @@ stx_pico_OutcomeLift.error = function(self) {
 	return tmp;
 };
 var stx_pico_Outcome = {};
+stx_pico_Outcome.__properties__ = {get_self:"get_self"};
 stx_pico_Outcome._new = function(self) {
 	var this1 = self;
 	return this1;
@@ -4993,6 +6126,8 @@ stx_pico_Outcome.prj = function(this1) {
 stx_pico_Outcome.get_self = function(this1) {
 	return stx_pico_Outcome.lift(this1);
 };
+var tink_Clone = function() { };
+tink_Clone.__name__ = "tink.Clone";
 var tink_core_Annex = function(target) {
 	this.target = target;
 	this.registry = new haxe_ds_ObjectMap();
@@ -5040,6 +6175,7 @@ tink_core_Callback.defer = function(f) {
 };
 var tink_core_LinkObject = function() { };
 tink_core_LinkObject.__name__ = "tink.core.LinkObject";
+tink_core_LinkObject.__isInterface__ = true;
 tink_core_LinkObject.prototype = {
 	cancel: null
 	,__class__: tink_core_LinkObject
@@ -5191,13 +6327,16 @@ tink_core__$Callback_ListCell.prototype = {
 };
 var tink_core_Disposable = function() { };
 tink_core_Disposable.__name__ = "tink.core.Disposable";
+tink_core_Disposable.__isInterface__ = true;
 tink_core_Disposable.prototype = {
 	get_disposed: null
 	,ondispose: null
 	,__class__: tink_core_Disposable
+	,__properties__: {get_disposed:"get_disposed"}
 };
 var tink_core_OwnedDisposable = function() { };
 tink_core_OwnedDisposable.__name__ = "tink.core.OwnedDisposable";
+tink_core_OwnedDisposable.__isInterface__ = true;
 tink_core_OwnedDisposable.__interfaces__ = [tink_core_Disposable];
 tink_core_OwnedDisposable.prototype = {
 	dispose: null
@@ -5243,6 +6382,7 @@ tink_core_SimpleDisposable.prototype = {
 		}
 	}
 	,__class__: tink_core_SimpleDisposable
+	,__properties__: {get_disposed:"get_disposed"}
 };
 var tink_core_CallbackList = function(destructive) {
 	if(destructive == null) {
@@ -5471,6 +6611,7 @@ tink_core_CallbackList.prototype = $extend(tink_core_SimpleDisposable.prototype,
 		this.resize(0);
 	}
 	,__class__: tink_core_CallbackList
+	,__properties__: $extend(tink_core_SimpleDisposable.prototype.__properties__,{get_length:"get_length"})
 });
 var tink_core_AlreadyDisposed = function() {
 };
@@ -5486,6 +6627,7 @@ tink_core_AlreadyDisposed.prototype = {
 	,dispose: function() {
 	}
 	,__class__: tink_core_AlreadyDisposed
+	,__properties__: {get_disposed:"get_disposed"}
 };
 var tink_core_TypedError = function(code,message,pos) {
 	if(code == null) {
@@ -5600,6 +6742,7 @@ tink_core__$Error_TinkError.prototype = $extend(Error.prototype,{
 });
 var tink_core__$Future_FutureObject = function() { };
 tink_core__$Future_FutureObject.__name__ = "tink.core._Future.FutureObject";
+tink_core__$Future_FutureObject.__isInterface__ = true;
 tink_core__$Future_FutureObject.prototype = {
 	getStatus: null
 	,handle: null
@@ -5623,6 +6766,7 @@ tink_core__$Future_NeverFuture.prototype = {
 };
 var tink_core__$Lazy_Computable = function() { };
 tink_core__$Lazy_Computable.__name__ = "tink.core._Lazy.Computable";
+tink_core__$Lazy_Computable.__isInterface__ = true;
 tink_core__$Lazy_Computable.prototype = {
 	isComputed: null
 	,compute: null
@@ -5631,6 +6775,7 @@ tink_core__$Lazy_Computable.prototype = {
 };
 var tink_core__$Lazy_LazyObject = function() { };
 tink_core__$Lazy_LazyObject.__name__ = "tink.core._Lazy.LazyObject";
+tink_core__$Lazy_LazyObject.__isInterface__ = true;
 tink_core__$Lazy_LazyObject.__interfaces__ = [tink_core__$Lazy_Computable];
 tink_core__$Lazy_LazyObject.prototype = {
 	get: null
@@ -5678,6 +6823,7 @@ tink_core__$Future_SyncFuture.prototype = {
 	,__class__: tink_core__$Future_SyncFuture
 };
 var tink_core_Future = {};
+tink_core_Future.__properties__ = {get_status:"get_status"};
 tink_core_Future.get_status = function(this1) {
 	return this1.getStatus();
 };
@@ -5693,9 +6839,13 @@ tink_core_Future.eager = function(this1) {
 	return this1;
 };
 tink_core_Future.noise = function(this1) {
-	return tink_core_Future.map(this1,function(_) {
-		return null;
-	});
+	if(this1.getStatus()._hx_index == 4) {
+		return tink_core_Future.NEVER;
+	} else {
+		return tink_core_Future.map(this1,function(_) {
+			return null;
+		});
+	}
 };
 tink_core_Future.first = function(this1,that) {
 	var _g = this1;
@@ -5824,7 +6974,7 @@ tink_core_Future.ofJsPromise = function(promise) {
 				_g(a1);
 			});
 		},function(e) {
-			cb(tink_core_Outcome.Failure(tink_core_TypedError.withData(null,e.message,e,{ fileName : "tink/core/Future.hx", lineNumber : 156, className : "tink.core._Future.Future_Impl_", methodName : "ofJsPromise"})));
+			cb(tink_core_Outcome.Failure(tink_core_TypedError.withData(null,e.message,e,{ fileName : "tink/core/Future.hx", lineNumber : 158, className : "tink.core._Future.Future_Impl_", methodName : "ofJsPromise"})));
 		});
 	});
 };
@@ -6218,6 +7368,7 @@ tink_core__$Future_SuspendableFuture.prototype = {
 	,__class__: tink_core__$Future_SuspendableFuture
 };
 var tink_core_Lazy = {};
+tink_core_Lazy.__properties__ = {get_computed:"get_computed"};
 tink_core_Lazy.get_computed = function(this1) {
 	return this1.isComputed();
 };
@@ -6618,6 +7769,7 @@ tink_core__$Outcome_OutcomeMapper.withEitherError = function(f) {
 	});
 };
 var tink_core_Pair = {};
+tink_core_Pair.__properties__ = {get_b:"get_b",get_a:"get_a"};
 tink_core_Pair._new = function(a,b) {
 	var this1 = new tink_core_MPair(a,b);
 	return this1;
@@ -6648,6 +7800,7 @@ tink_core_MPair.prototype = {
 	,__class__: tink_core_MPair
 };
 var tink_core_ProgressValue = {};
+tink_core_ProgressValue.__properties__ = {get_total:"get_total",get_value:"get_value"};
 tink_core_ProgressValue._new = function(value,total) {
 	var this1 = new tink_core_MPair(value,total);
 	var this2 = this1;
@@ -6791,6 +7944,7 @@ tink_core__$Progress_ProgressObject.prototype = {
 	,progressed: null
 	,result: null
 	,__class__: tink_core__$Progress_ProgressObject
+	,__properties__: {get_status:"get_status"}
 };
 var tink_core__$Progress_SuspendableProgress = function(wakeup,status) {
 	if(status == null) {
@@ -7011,9 +8165,13 @@ tink_core_Promise.handle = function(this1,cb) {
 	return this1.handle(cb);
 };
 tink_core_Promise.noise = function(this1) {
-	return tink_core_Promise.next(this1,function(v) {
-		return new tink_core__$Future_SyncFuture(new tink_core__$Lazy_LazyConst(tink_core_Outcome.Success(null)));
-	});
+	if(this1.getStatus()._hx_index == 4) {
+		return tink_core_Promise.NEVER;
+	} else {
+		return tink_core_Promise.next(this1,function(v) {
+			return new tink_core__$Future_SyncFuture(new tink_core__$Lazy_LazyConst(tink_core_Outcome.Success(null)));
+		});
+	}
 };
 tink_core_Promise.isSuccess = function(this1) {
 	return tink_core_Future.map(this1,function(o) {
@@ -7299,6 +8457,7 @@ tink_core_PromiseTrigger.asPromise = function(this1) {
 	return this1;
 };
 var tink_core_Ref = {};
+tink_core_Ref.__properties__ = {set_value:"set_value",get_value:"get_value"};
 tink_core_Ref._new = function() {
 	var this1 = new Array(1);
 	var this2 = this1;
@@ -7465,6 +8624,7 @@ tink_core_Signal.dead = function() {
 };
 var tink_core__$Signal_SignalObject = function() { };
 tink_core__$Signal_SignalObject.__name__ = "tink.core._Signal.SignalObject";
+tink_core__$Signal_SignalObject.__isInterface__ = true;
 tink_core__$Signal_SignalObject.__interfaces__ = [tink_core_Disposable];
 tink_core__$Signal_SignalObject.prototype = {
 	listen: null
@@ -7548,6 +8708,7 @@ tink_core__$Signal_Suspendable.prototype = {
 		}
 	}
 	,__class__: tink_core__$Signal_Suspendable
+	,__properties__: {get_disposed:"get_disposed"}
 };
 var tink_core_SignalTrigger = function() {
 	this.handlers = new tink_core_CallbackList();
@@ -7598,6 +8759,7 @@ tink_core_SignalTrigger.prototype = {
 		return this;
 	}
 	,__class__: tink_core_SignalTrigger
+	,__properties__: {get_disposed:"get_disposed"}
 };
 function $iterator(o) { if( o instanceof Array ) return function() { return new haxe_iterators_ArrayIterator(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 function $getIterator(o) { if( o instanceof Array ) return new haxe_iterators_ArrayIterator(o); else return o.iterator(); }
@@ -7610,9 +8772,21 @@ if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c
 String.prototype.__class__ = String;
 String.__name__ = "String";
 Array.__name__ = "Array";
+var Int = { };
+var Dynamic = { };
+var Float = Number;
+var Bool = Boolean;
+var Class = { };
+var Enum = { };
 haxe_Resource.content = [];
 haxe_ds_ObjectMap.count = 0;
 js_Boot.__toStr = ({ }).toString;
+auction_server_Handler._ = auction_server_HandlerLift;
+auction_server_bid_BidSchema.counter = new auction_server_pack_Counter();
+auction_server_saleable_Saleable.counter = new auction_server_pack_Counter();
+auction_server_session_Session.counter = new auction_server_pack_Counter();
+auction_server_session_SessionSchema.counter = new auction_server_pack_Counter();
+auction_server_ws_Handler._ = auction_server_ws_HandlerLift;
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe_crypto_Base64.BYTES = haxe_io_Bytes.ofString(haxe_crypto_Base64.CHARS);
 stx_nano_Couple._ = stx_nano_CoupleLift;
@@ -7639,10 +8813,9 @@ stx_pico_Outcome._ = stx_pico_OutcomeLift;
 tink_core_Callback.depth = 0;
 tink_core_Callback.MAX_DEPTH = 500;
 tink_core_AlreadyDisposed.INST = new tink_core_AlreadyDisposed();
-tink_core__$Future_NeverFuture.inst = new tink_core__$Future_NeverFuture();
 tink_core_Future.NOISE = new tink_core__$Future_SyncFuture(new tink_core__$Lazy_LazyConst(null));
 tink_core_Future.NULL = tink_core_Future.NOISE;
-tink_core_Future.NEVER = tink_core__$Future_NeverFuture.inst;
+tink_core_Future.NEVER = new tink_core__$Future_NeverFuture();
 tink_core_Lazy.NOISE = new tink_core__$Lazy_LazyConst(null);
 tink_core_Lazy.NULL = tink_core_Lazy.NOISE;
 tink_core_Noise.Noise = null;
@@ -7656,7 +8829,7 @@ tink_core_ProgressValue.ZERO = (function($this) {
 tink_core_Progress.INIT = tink_core_ProgressValue.ZERO;
 tink_core_Promise.NOISE = new tink_core__$Future_SyncFuture(new tink_core__$Lazy_LazyConst(tink_core_Outcome.Success(null)));
 tink_core_Promise.NULL = tink_core_Promise.NOISE;
-tink_core_Promise.NEVER = tink_core_Future.map(tink_core_Future.NEVER,tink_core_Outcome.Success);
+tink_core_Promise.NEVER = tink_core_Future.NEVER;
 tink_core__$Signal_Disposed.INST = new tink_core__$Signal_Disposed();
 Server.main();
 })(typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

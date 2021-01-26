@@ -1,5 +1,9 @@
 -lib hxnodejs
 
+
 -lib express
 -lib express-serve-static-core
+-lib ws
+-lib express-ws
+
 -lib golgi

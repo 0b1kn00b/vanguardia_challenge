@@ -1,5 +1,7 @@
 package auction.server.test;
 
+import auction.server.Handler;
+
 class RouterTest extends Test{
   public function test(){
     var context = new ContextSchema().mock().fudge().fudge();

@@ -32,7 +32,7 @@ class AuctionMemoryModel implements AuctionModelApi extends MemoryStore<Auction>
             }
           );
         },
-        () -> Pledge.reject(__.fault().of(NoSuchAuction))
+        () -> Pledge.reject(__.fault().of(E_NoSuchAuction))
       )
     );
   }

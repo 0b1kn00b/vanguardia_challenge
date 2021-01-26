@@ -2,7 +2,7 @@
 
 Generated from **[@types/node v14.14.22](https://github.com/DefinitelyTyped/DefinitelyTyped#readme)** by **[dts2hx](https://github.com/haxiomic/dts2hx) 0.15.3** using **TypeScript 3.7.4** with arguments:
 
-	dts2hx @types/express
+	dts2hx @types/express-ws
 
 ## Contributors to @types/node
 - [Microsoft TypeScript](https://github.com/Microsoft)
