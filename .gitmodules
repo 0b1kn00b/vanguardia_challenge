@@ -52,3 +52,6 @@
 [submodule ".haxelib/tink_macro/git"]
 	path = .haxelib/tink_macro/git
 	url = https://github.com/haxetink/tink_macro.git
+[submodule ".haxelib/hx3compat/git"]
+	path = .haxelib/hx3compat/git
+	url = https://github.com/HaxeFoundation/hx3compat.git
