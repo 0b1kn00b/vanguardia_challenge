@@ -2,3 +2,9 @@
 	path = .haxelib/cloner/git
 	url = https://github.com/thomasuster/cloner.git
 
+[submodule ".haxelib/golgi/git"]
+	path = .haxelib/golgi/git
+	url = https://github.com/jdonaldson/golgi.git
+[submodule ".haxelib/polygonal-printf/git"]
+	path = .haxelib/polygonal-printf/git
+	url = https://github.com/polygonal/printf.git
