@@ -1,0 +1,4 @@
+[submodule ".haxelib/cloner/git"]
+	path = .haxelib/cloner/git
+	url = https://github.com/thomasuster/cloner.git
+
