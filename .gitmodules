@@ -55,3 +55,6 @@
 [submodule ".haxelib/hx3compat/git"]
 	path = .haxelib/hx3compat/git
 	url = https://github.com/HaxeFoundation/hx3compat.git
+[submodule ".haxelib/actuate/git"]
+	path = .haxelib/actuate/git
+	url = https://github.com/jgranick/actuate.git
