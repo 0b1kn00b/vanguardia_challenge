@@ -8,3 +8,27 @@
 [submodule ".haxelib/polygonal-printf/git"]
 	path = .haxelib/polygonal-printf/git
 	url = https://github.com/polygonal/printf.git
+[submodule ".haxelib/stx_assert/git"]
+	path = .haxelib/stx_assert/git
+	url = https://github.com/ohmrun/stx_assert.git
+[submodule ".haxelib/stx_fn/git"]
+	path = .haxelib/stx_fn/git
+	url = https://github.com/ohmrun/stx_fn.git
+[submodule ".haxelib/stx_fp/git"]
+	path = .haxelib/stx_fp/git
+	url = https://github.com/ohmrun/stx_fp.git
+[submodule ".haxelib/stx_log/git"]
+	path = .haxelib/stx_log/git
+	url = https://github.com/ohmrun/stx_log.git
+[submodule ".haxelib/stx_nano/git"]
+	path = .haxelib/stx_nano/git
+	url = https://github.com/ohmrun/stx_nano.git
+[submodule ".haxelib/stx_pico/git"]
+	path = .haxelib/stx_pico/git
+	url = https://github.com/ohmrun/stx_pico.git
+[submodule ".haxelib/tink_clone/git"]
+	path = .haxelib/tink_clone/git
+	url = https://github.com/haxetink/tink_clone.git
+[submodule ".haxelib/tink_core/git"]
+	path = .haxelib/tink_core/git
+	url = https://github.com/haxetink/tink_core.git
