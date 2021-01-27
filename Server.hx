@@ -1,6 +1,7 @@
 using stx.Pico;
 using stx.Nano;
 
+import auction.common.ModelCommon;
 import auction.Server;
 import auction.server.router.*;
 

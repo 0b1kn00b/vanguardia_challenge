@@ -1,14 +1,10 @@
 package auction;
 
-
 using auction.client.Magic;
 using auction.client.View;
 using auction.client.ModelClient;
 using auction.client.Request;
 using auction.client.ViewModel;
-
-typedef ClientEventCls  = auction.client.ClientEvent.ClientEventCls;
-typedef ClientEvent     = auction.client.ClientEvent;
 
 class Client{
 

@@ -626,6 +626,16 @@ Type.enumParameters = function(e) {
 };
 var auction_Server = function() { };
 auction_Server.__name__ = "auction.Server";
+var auction_common_form_SignInForm = function(name,pass) {
+	this.name = name;
+	this.pass = pass;
+};
+auction_common_form_SignInForm.__name__ = "auction.common.form.SignInForm";
+auction_common_form_SignInForm.prototype = {
+	name: null
+	,pass: null
+	,__class__: auction_common_form_SignInForm
+};
 var auction_common_model_api_ApiApi = function() { };
 auction_common_model_api_ApiApi.__name__ = "auction.common.model.api.ApiApi";
 auction_common_model_api_ApiApi.__isInterface__ = true;
@@ -874,7 +884,8 @@ auction_common_model_auction_AuctionSchema.prototype = $extend(stx_pico_Clazz.pr
 var stx_data_store_UniqueKey = function() { };
 stx_data_store_UniqueKey.__name__ = "stx.data.store.UniqueKey";
 stx_data_store_UniqueKey.prototype = {
-	uid: null
+	id: null
+	,uid: null
 	,get_uid: null
 	,__class__: stx_data_store_UniqueKey
 	,__properties__: {get_uid:"get_uid"}
@@ -931,7 +942,6 @@ auction_common_model_auction_AuctionVO.prototype = $extend(stx_data_store_Unique
 	,duration: null
 	,start_time: null
 	,bids: null
-	,id: null
 	,get_uid: function() {
 		return this.id;
 	}
@@ -1010,7 +1020,6 @@ auction_common_model_bid_BidVO.prototype = $extend(stx_data_store_UniqueKey.prot
 	,item: null
 	,bid: null
 	,time: null
-	,id: null
 	,get_uid: function() {
 		return this.id;
 	}
@@ -1117,7 +1126,6 @@ auction_common_model_saleable_SaleableVO.prototype = $extend(stx_data_store_Uniq
 	name: null
 	,description: null
 	,img: null
-	,id: null
 	,get_uid: function() {
 		return this.id;
 	}
@@ -1170,8 +1178,7 @@ var auction_common_model_session_SessionVO = function(id,start_time,user) {
 auction_common_model_session_SessionVO.__name__ = "auction.common.model.session.SessionVO";
 auction_common_model_session_SessionVO.__super__ = stx_data_store_UniqueKey;
 auction_common_model_session_SessionVO.prototype = $extend(stx_data_store_UniqueKey.prototype,{
-	id: null
-	,get_uid: function() {
+	get_uid: function() {
 		return this.id;
 	}
 	,user: null
@@ -1297,7 +1304,6 @@ auction_common_model_user_UserVO.prototype = $extend(stx_data_store_UniqueKey.pr
 	clone: function() {
 		return new cloner_Cloner().clone(this);
 	}
-	,id: null
 	,name: null
 	,pass: null
 	,bids: null
@@ -1872,7 +1878,7 @@ auction_server_test_UserTest.prototype = $extend(utest_Test.prototype,{
 			var e = self.e;
 			throw haxe_Exception.thrown(e);
 		}
-		var self = stx_nano_PledgeLift.fudge(user_model.sign_in({ name : "User1", pass : "IAmUserOne"}));
+		var self = stx_nano_PledgeLift.fudge(user_model.sign_in(new auction_common_form_SignInForm("User1","IAmUserOne")));
 		var result;
 		switch(self._hx_index) {
 		case 0:
@@ -1884,7 +1890,7 @@ auction_server_test_UserTest.prototype = $extend(utest_Test.prototype,{
 			throw haxe_Exception.thrown(e);
 		}
 		utest_Assert.isTrue(result,null,{ fileName : "src/main/haxe/auction/server/test/UserTest.hx", lineNumber : 10, className : "auction.server.test.UserTest", methodName : "test"});
-		var self = stx_nano_PledgeLift.fudge(user_model.sign_in({ name : "User1", pass : "fnart"}));
+		var self = stx_nano_PledgeLift.fudge(user_model.sign_in(new auction_common_form_SignInForm("User1","fnart")));
 		var result;
 		switch(self._hx_index) {
 		case 0:
@@ -6234,18 +6240,6 @@ stx_Test.test = function(test,only) {
 	(function(value,pos) {
 		this2(value,fn1(pos));
 	})(test,{ fileName : "stx/Test.hx", lineNumber : 25, className : "stx.Test", methodName : "test"});
-	var f = stx_Test.poke(stx_nano_Wildcard.__,only);
-	var _g = [];
-	var _g1 = 0;
-	var _g2 = test;
-	while(_g1 < _g2.length) {
-		var v = _g2[_g1];
-		++_g1;
-		if(f(v)) {
-			_g.push(v);
-		}
-	}
-	test = _g;
 	var this3 = stx_test_Log.log(stx_nano_Wildcard.__);
 	var fn2 = function(pos) {
 		return stx_log_LogPosition.restamp(pos,function(stamp) {
@@ -8252,18 +8246,64 @@ stx_assert_predicate_term_XOr.prototype = $extend(stx_assert_predicate_term_Open
 	}
 	,__class__: stx_assert_predicate_term_XOr
 });
+var stx_data_store_StoreBackedApi = function() { };
+stx_data_store_StoreBackedApi.__name__ = "stx.data.store.StoreBackedApi";
+stx_data_store_StoreBackedApi.__isInterface__ = true;
+stx_data_store_StoreBackedApi.prototype = {
+	store: null
+	,inner: null
+	,get_inner: null
+	,toApi: null
+	,__class__: stx_data_store_StoreBackedApi
+	,__properties__: {get_inner:"get_inner"}
+};
+var stx_data_store_StoreBackedAbs = function(store) {
+	this.store = store;
+};
+stx_data_store_StoreBackedAbs.__name__ = "stx.data.store.StoreBackedAbs";
+stx_data_store_StoreBackedAbs.__interfaces__ = [stx_data_store_StoreBackedApi];
+stx_data_store_StoreBackedAbs.prototype = {
+	store: null
+	,inner: null
+	,get_inner: null
+	,toApi: function() {
+		return this;
+	}
+	,__class__: stx_data_store_StoreBackedAbs
+	,__properties__: {get_inner:"get_inner"}
+};
+var stx_data_store_StoreSchemaApi = function() { };
+stx_data_store_StoreSchemaApi.__name__ = "stx.data.store.StoreSchemaApi";
+stx_data_store_StoreSchemaApi.__isInterface__ = true;
+stx_data_store_StoreSchemaApi.prototype = {
+	create: null
+	,__class__: stx_data_store_StoreSchemaApi
+};
+var stx_data_store_StoreInMemorySchema = function() {
+};
+stx_data_store_StoreInMemorySchema.__name__ = "stx.data.store.StoreInMemorySchema";
+stx_data_store_StoreInMemorySchema.__interfaces__ = [stx_data_store_StoreSchemaApi];
+stx_data_store_StoreInMemorySchema.prototype = {
+	create: null
+	,__class__: stx_data_store_StoreInMemorySchema
+};
 var stx_fail_AssertFailure = $hxEnums["stx.fail.AssertFailure"] = { __ename__:"stx.fail.AssertFailure",__constructs__:null
 	,PredicateFailed: ($_=function(type,valueN,value0) { return {_hx_index:0,type:type,valueN:valueN,value0:value0,__enum__:"stx.fail.AssertFailure",toString:$estr}; },$_._hx_name="PredicateFailed",$_.__params__ = ["type","valueN","value0"],$_)
 };
 stx_fail_AssertFailure.__constructs__ = [stx_fail_AssertFailure.PredicateFailed];
 var stx_fail_AuctionFailure = $hxEnums["stx.fail.AuctionFailure"] = { __ename__:"stx.fail.AuctionFailure",__constructs__:null
-	,E_AuctionFailed: ($_=function(str) { return {_hx_index:0,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_AuctionFailed",$_.__params__ = ["str"],$_)
-	,E_AuctionEnded: {_hx_name:"E_AuctionEnded",_hx_index:1,__enum__:"stx.fail.AuctionFailure",toString:$estr}
-	,E_NoSuchAuction: {_hx_name:"E_NoSuchAuction",_hx_index:2,__enum__:"stx.fail.AuctionFailure",toString:$estr}
-	,E_LostRequest: {_hx_name:"E_LostRequest",_hx_index:3,__enum__:"stx.fail.AuctionFailure",toString:$estr}
-	,E_Golgi_Error: ($_=function(error) { return {_hx_index:4,error:error,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Golgi_Error",$_.__params__ = ["error"],$_)
+	,E_UnImplemented: {_hx_name:"E_UnImplemented",_hx_index:0,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_Exit: {_hx_name:"E_Exit",_hx_index:1,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_AuctionFailed: ($_=function(str) { return {_hx_index:2,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_AuctionFailed",$_.__params__ = ["str"],$_)
+	,E_AuctionEnded: {_hx_name:"E_AuctionEnded",_hx_index:3,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_NoSuchAuction: {_hx_name:"E_NoSuchAuction",_hx_index:4,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_LostRequest: {_hx_name:"E_LostRequest",_hx_index:5,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_LocationNotFound: {_hx_name:"E_LocationNotFound",_hx_index:6,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_Bubble: ($_=function(f) { return {_hx_index:7,f:f,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Bubble",$_.__params__ = ["f"],$_)
+	,E_Golgi_Error: ($_=function(error) { return {_hx_index:8,error:error,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Golgi_Error",$_.__params__ = ["error"],$_)
+	,E_RouteNotFound: ($_=function(route) { return {_hx_index:9,route:route,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_RouteNotFound",$_.__params__ = ["route"],$_)
 };
-stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.E_AuctionFailed,stx_fail_AuctionFailure.E_AuctionEnded,stx_fail_AuctionFailure.E_NoSuchAuction,stx_fail_AuctionFailure.E_LostRequest,stx_fail_AuctionFailure.E_Golgi_Error];
+stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.E_UnImplemented,stx_fail_AuctionFailure.E_Exit,stx_fail_AuctionFailure.E_AuctionFailed,stx_fail_AuctionFailure.E_AuctionEnded,stx_fail_AuctionFailure.E_NoSuchAuction,stx_fail_AuctionFailure.E_LostRequest,stx_fail_AuctionFailure.E_LocationNotFound,stx_fail_AuctionFailure.E_Bubble,stx_fail_AuctionFailure.E_Golgi_Error,stx_fail_AuctionFailure.E_RouteNotFound];
 var stx_fail_LogFailure = $hxEnums["stx.fail.LogFailure"] = { __ename__:"stx.fail.LogFailure",__constructs__:null
 	,E_Log_UnderLogLevel: {_hx_name:"E_Log_UnderLogLevel",_hx_index:0,__enum__:"stx.fail.LogFailure",toString:$estr}
 	,E_Log_SourceNotInPackage: ($_=function(source,dir) { return {_hx_index:1,source:source,dir:dir,__enum__:"stx.fail.LogFailure",toString:$estr}; },$_._hx_name="E_Log_SourceNotInPackage",$_.__params__ = ["source","dir"],$_)
@@ -10612,7 +10652,7 @@ stx_nano_PledgeLift.errata = function(fn,self) {
 		return stx_nano_Res._new(self);
 	});
 };
-stx_nano_PledgeLift.each = function(self,fn) {
+stx_nano_PledgeLift.each = function(self,fn,err) {
 	stx_nano_Pledge.prj(self).handle(function(res) {
 		switch(res._hx_index) {
 		case 0:
@@ -10621,6 +10661,15 @@ stx_nano_PledgeLift.each = function(self,fn) {
 			break;
 		case 1:
 			var e = res.e;
+			var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,err);
+			switch(self._hx_index) {
+			case 0:
+				var t = self.v;
+				t(e);
+				break;
+			case 1:
+				throw haxe_Exception.thrown(e);
+			}
 			break;
 		}
 	});
@@ -17550,7 +17599,7 @@ stx_log_Signal.is_custom = false;
 stx_log_LogPosition.id = "306cccf1-89a7-44a4-b99a-7c69772a528d";
 stx_Log._ = stx_LogLift;
 stx_Log.ZERO = stx_Log.LOG;
-stx_Test.pokey = "poke";
+stx_Test.pokey = "test";
 stx_nano_Err.UUID = "e30e1389-4a72-41fe-ba9f-d7ddf3d1e247";
 stx_assert_EqualedSum.AreEqual = true;
 stx_assert_EqualedSum.NotEqual = false;

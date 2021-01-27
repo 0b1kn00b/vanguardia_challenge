@@ -9,9 +9,7 @@ package auction.client.view.model.context;
       (context) -> {
         var navigation  = new NavigationViewModel(
           root.window.navigation,
-          new LocationMemoryModel(),
-          new HomeViewModel(root.window.navigation),
-          new CredentialViewModel(root.window.navigation.credential)
+          new LocationMemoryModel()
         );
         var error       = null;
     

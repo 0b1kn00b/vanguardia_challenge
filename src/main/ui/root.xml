@@ -1,1 +1,3 @@
-<window></window>
+<box>
+  <window id="window"></window>
+</box>

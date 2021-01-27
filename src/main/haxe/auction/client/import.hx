@@ -15,3 +15,4 @@ using auction.client.ModelClient;
 using auction.client.UI;
 using auction.client.Lift;
 using auction.client.Magic;
+using auction.client.Request;

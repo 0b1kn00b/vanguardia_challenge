@@ -10,4 +10,3 @@ import cloner.Cloner;
 
 using auction.App;
 using auction.common.ModelCommon;
-using auction.client.Request;

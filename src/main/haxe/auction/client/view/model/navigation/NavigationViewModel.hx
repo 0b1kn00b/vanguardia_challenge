@@ -8,11 +8,11 @@ class NavigationViewModel implements NavigationViewModelApi{
   public final home       : HomeViewModel;
   public final credential : CredentialViewModel;
 
-  public function new(data,location,home,credential){
+  public function new(data,location){
     this.data       = data;
     this.location   = location;
-    this.home       = home;
-    this.credential = credential;
+    this.home       = new HomeViewModel(this);
+    this.credential = new CredentialViewModel(this.data.credential);
   }
   public function route(req:Request):AppPledge<Noise>{
     return switch(req){

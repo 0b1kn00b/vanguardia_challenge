@@ -1,9 +1,9 @@
 package auction.client.ui;
 
 @:build(haxe.ui.macros.ComponentMacros.build("src/main/ui/root.xml"))
-class Root extends WindowComponent{
+class Root extends Box{
   public function new(){
-    super();
+  super();
   }
   // @:bind(button, MouseEvent.CLICK)
   // function onButton(e) {
