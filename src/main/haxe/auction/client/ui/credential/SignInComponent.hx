@@ -6,7 +6,7 @@ class SignInComponent extends haxe.ui.containers.VBox{
   
   public function new(){
     super();
-    this.form = new SignInForm();
+    this.form = new SignInForm(null,null);
   }
   @:bind(send,MouseEvent.CLICK)
   function on_send(e){

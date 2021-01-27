@@ -20,7 +20,7 @@ package auction.client.view.model.context;
           error       : (e:AppErr) -> {
             navigation.route(AppFail(e)).each(
               (_) -> {},
-              __.crack
+              (e) -> __.crack(e)
             );
           }
         }:ViewContextCls);
