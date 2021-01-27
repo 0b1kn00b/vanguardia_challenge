@@ -81,3 +81,6 @@
 [submodule ".haxelib/haxeui-html5/git"]
 	path = .haxelib/haxeui-html5/git
 	url = https://github.com/haxeui/haxeui-html5.git
+[submodule ".haxelib/peteshand/git"]
+	path = .haxelib/peteshand/git
+	url = https://github.com/peteshand/signals.git

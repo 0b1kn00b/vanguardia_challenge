@@ -27,8 +27,9 @@ class Client{
   }
   public function handle(request:Request){
     switch(request){
-      //case UserReq(SignIn(form)) : model
-      default : 
-    }
+      case UserReq(SignIn(form)) : 
+        data.api.user.sign_in(form);
+      //default : 
+    } 
   }
 }
