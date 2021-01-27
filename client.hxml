@@ -11,7 +11,7 @@
 -lib signals
 
 #-D js-es=6
--D dump=pretty
+#-D dump=pretty
 
 --main Client
 --js dist/public/js/client.js
