@@ -7,7 +7,7 @@ class AuctionTest extends Test{
     var bid_model     = new BidMemoryModel();
     var auction_model = new AuctionMemoryModel(bid_model);
 
-    var auction = Auction.make(
+    var auction = new AuctionSchema().make(
       1,
       10000,
       -999.9,
@@ -51,7 +51,7 @@ class AuctionTest extends Test{
       __.decouple(pull)
     );
     
-    // var v = new AuctionMemoryStore();
+    // var v = new AuctionStoreInMemory();
     //     v.insert()
   }
 }

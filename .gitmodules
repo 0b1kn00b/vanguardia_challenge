@@ -62,3 +62,22 @@
 [submodule ".haxelib/hxargs/git"]
 	path = .haxelib/hxargs/git
 	url = https://github.com/Simn/hxargs.git
+[submodule ".haxelib/lime/git"]
+	path = .haxelib/lime/git
+	url = https://github.com/haxelime/lime.git
+[submodule ".haxelib/format/git"]
+	path = .haxelib/format/git
+	url = https://github.com/HaxeFoundation/format.git
+[submodule ".haxelib/hxp/git"]
+	path = .haxelib/hxp/git
+	url = https://github.com/haxelime/hxp.git
+[submodule ".haxelib/hxcpp/git"]
+	path = .haxelib/hxcpp/git
+	url = https://github.com/HaxeFoundation/hxcpp.git
+	shallow = true
+[submodule ".haxelib/haxeui-core/git"]
+	path = .haxelib/haxeui-core/git
+	url = https://github.com/haxeui/haxeui-core.git
+[submodule ".haxelib/haxeui-html5/git"]
+	path = .haxelib/haxeui-html5/git
+	url = https://github.com/haxeui/haxeui-html5.git

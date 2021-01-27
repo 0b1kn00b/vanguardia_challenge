@@ -1,30 +1,24 @@
 import haxe.net.WebSocket;
 
-import feathers.controls.Application;
-import feathers.controls.Button;
-import feathers.events.TriggerEvent;
+import haxe.ui.core.Screen;
 
-class ExampleProject extends Application {
-  public function new() {
-    super();
+using stx.Pico;
+using stx.Nano;
 
-    var button = new Button();
-    button.text = "Click Me";
-    button.addEventListener(TriggerEvent.TRIGGER, onTrigger);
-    addChild(button);
-  }
+using auction.client.Magic;
 
-  private function onTrigger(event:TriggerEvent):Void {
-    trace("Button was clicked or tapped");
-  }
-}
+using auction.client.UI;
+using auction.client.View;
+using auction.client.ModelClient;
 
-@:expose class Client{
+class Client{
+  @:expose static public var instance : auction.Client;
 
   public function new(){}
   
   static public function main(){
-    var project = new ExampleProject();
+    haxe.ui.Toolkit.init();
+    instance   = new auction.Client(new View(new Root()),new ContextInClientCls());
   }
 }
 class Ws{

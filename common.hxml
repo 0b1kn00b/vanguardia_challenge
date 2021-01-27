@@ -1,6 +1,6 @@
 -cp src/main/haxe/
 
--D debug
+#-D debug
 -D no-deprecation-warnings
 
 -lib utest

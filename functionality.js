@@ -626,185 +626,33 @@ Type.enumParameters = function(e) {
 };
 var auction_Server = function() { };
 auction_Server.__name__ = "auction.Server";
-var auction_server_GolgiExpressPath = {};
-auction_server_GolgiExpressPath._new = function(self) {
-	var this1 = self;
-	return this1;
-};
-auction_server_GolgiExpressPath.fromRequest = function(self) {
-	var arr = self.path.split("/");
-	arr.shift();
-	return auction_server_GolgiExpressPath._new(arr);
-};
-var auction_server_HandlerLift = function() { };
-auction_server_HandlerLift.__name__ = "auction.server.HandlerLift";
-auction_server_HandlerLift.apply = function(router,req,res,next) {
-	var path = auction_server_GolgiExpressPath.fromRequest(req);
-	try {
-		var operation = router.route(path,null,req);
-		if(operation._hx_index == 2) {
-			var _g = operation.result;
-			res.sendFile("" + process.cwd() + "/templates/home.html");
-		} else {
-			next();
-		}
-	} catch( _g ) {
-		haxe_NativeStackTrace.lastError = _g;
-		var _g1 = haxe_Exception.caught(_g).unwrap();
-		if(js_Boot.__instanceof(_g1,golgi_Error)) {
-			var e = _g1;
-			next(e);
-		} else {
-			throw _g;
-		}
-	}
-};
-var auction_server_Handler = {};
-auction_server_Handler._new = function(router) {
-	var router1 = router;
-	var this1 = function(req,res,next) {
-		auction_server_Handler._.apply(router1,req,res,next);
-	};
-	return this1;
-};
-var auction_server_Test = function() { };
-auction_server_Test.__name__ = "auction.server.Test";
-auction_server_Test.main = function() {
-	stx_Test.test([new auction_server_test_SaleableTest(),new auction_server_test_AuctionTest(),new auction_server_MacroNotClashTest(),new auction_server_test_TinkPureTest(),new auction_server_test_MemoryStoreTest(),new auction_server_test_UserTest(),new auction_server_test_RouterTest()],[auction_server_test_RouterTest]);
-};
-var utest_ITest = function() { };
-utest_ITest.__name__ = "utest.ITest";
-utest_ITest.__isInterface__ = true;
-var utest_Test = function() {
-};
-utest_Test.__name__ = "utest.Test";
-utest_Test.__interfaces__ = [utest_ITest];
-utest_Test.prototype = {
-	__initializeUtest__: function() {
-		var init = { tests : [], dependencies : [], accessories : { }};
-		return init;
-	}
-	,__class__: utest_Test
-};
-var auction_server_MacroNotClashTest = function() {
-	utest_Test.call(this);
-};
-auction_server_MacroNotClashTest.__name__ = "auction.server.MacroNotClashTest";
-auction_server_MacroNotClashTest.__super__ = utest_Test;
-auction_server_MacroNotClashTest.prototype = $extend(utest_Test.prototype,{
-	__initializeUtest__: function() {
-		var init = utest_Test.prototype.__initializeUtest__.call(this);
-		return init;
-	}
-	,__class__: auction_server_MacroNotClashTest
-});
-var auction_server_api_ApiApi = function() { };
-auction_server_api_ApiApi.__name__ = "auction.server.api.ApiApi";
-auction_server_api_ApiApi.__isInterface__ = true;
-auction_server_api_ApiApi.prototype = {
+var auction_common_model_api_ApiApi = function() { };
+auction_common_model_api_ApiApi.__name__ = "auction.common.model.api.ApiApi";
+auction_common_model_api_ApiApi.__isInterface__ = true;
+auction_common_model_api_ApiApi.prototype = {
 	user: null
 	,session: null
 	,auction: null
 	,saleable: null
 	,bid: null
-	,__class__: auction_server_api_ApiApi
+	,__class__: auction_common_model_api_ApiApi
 };
-var auction_server_api_ApiCls = function(user,session,auction,saleable,bid) {
+var auction_common_model_api_ApiCls = function(user,session,auction,saleable,bid) {
 	this.user = user;
 	this.session = session;
 	this.auction = auction;
 	this.saleable = saleable;
 	this.bid = bid;
 };
-auction_server_api_ApiCls.__name__ = "auction.server.api.ApiCls";
-auction_server_api_ApiCls.__interfaces__ = [auction_server_api_ApiApi];
-auction_server_api_ApiCls.prototype = {
+auction_common_model_api_ApiCls.__name__ = "auction.common.model.api.ApiCls";
+auction_common_model_api_ApiCls.__interfaces__ = [auction_common_model_api_ApiApi];
+auction_common_model_api_ApiCls.prototype = {
 	user: null
 	,session: null
 	,auction: null
 	,saleable: null
 	,bid: null
-	,__class__: auction_server_api_ApiCls
-};
-var auction_server_store_VO = function() { };
-auction_server_store_VO.__name__ = "auction.server.store.VO";
-auction_server_store_VO.prototype = {
-	uid: null
-	,get_uid: null
-	,__class__: auction_server_store_VO
-	,__properties__: {get_uid:"get_uid"}
-};
-var auction_server_auction_Auction = function(saleable,duration,start_time,bids,id) {
-	this.saleable = auction_server_saleable_SaleableId.toInt(saleable);
-	this.duration = duration;
-	this.start_time = start_time;
-	this.bids = bids;
-	this.id = id;
-};
-auction_server_auction_Auction.__name__ = "auction.server.auction.Auction";
-auction_server_auction_Auction.make = function(saleable,duration,start_time,bids,id) {
-	return new auction_server_auction_Auction(saleable,duration,start_time,bids,id);
-};
-auction_server_auction_Auction.__super__ = auction_server_store_VO;
-auction_server_auction_Auction.prototype = $extend(auction_server_store_VO.prototype,{
-	clone: function() {
-		return new cloner_Cloner().clone(this);
-	}
-	,stamp: function() {
-		if(this.start_time > 0) {
-			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/auction/Auction.hx", lineNumber : 18, className : "auction.server.auction.Auction", methodName : "stamp"});
-			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_AuctionFailed("already started"))),haxe_ds_Option.None,this1)));
-		} else {
-			var that = this.clone();
-			var hrtime = process.hrtime();
-			that.start_time = hrtime[0] + hrtime[1] / 1e9;
-			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,that));
-		}
-	}
-	,end_time: null
-	,get_end_time: function() {
-		var _gthis = this;
-		return stx_pico_OptionLift.map(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,this.start_time),function(f) {
-			return f + _gthis.duration;
-		});
-	}
-	,has_ended: function() {
-		var self = this.get_end_time();
-		switch(self._hx_index) {
-		case 0:
-			var t = self.v;
-			var hrtime = process.hrtime();
-			return hrtime[0] + hrtime[1] / 1e9 > t;
-		case 1:
-			return false;
-		}
-	}
-	,remaining_time: function() {
-		return stx_pico_OptionLift.map(this.get_end_time(),function(ok) {
-			var hrtime = process.hrtime();
-			return ok - (hrtime[0] + hrtime[1] / 1e9);
-		});
-	}
-	,saleable: null
-	,duration: null
-	,start_time: null
-	,bids: null
-	,id: null
-	,get_uid: function() {
-		return this.id;
-	}
-	,__class__: auction_server_auction_Auction
-	,__properties__: $extend(auction_server_store_VO.prototype.__properties__,{get_end_time:"get_end_time"})
-});
-var auction_server_auction_AuctionId = {};
-auction_server_auction_AuctionId.toInt = function(this1) {
-	return this1;
-};
-auction_server_auction_AuctionId.toIntKey = function(this1) {
-	var _e = this1;
-	return { toInt : function() {
-		return auction_server_auction_AuctionId.toInt(_e);
-	}};
+	,__class__: auction_common_model_api_ApiCls
 };
 var stx_pico_Clazz = $hx_exports["stx"]["Clazz"] = function() {
 };
@@ -819,25 +667,55 @@ stx_pico_Clazz.prototype = {
 	}
 	,__class__: stx_pico_Clazz
 };
-var auction_server_store_StoreApi = function() { };
-auction_server_store_StoreApi.__name__ = "auction.server.store.StoreApi";
-auction_server_store_StoreApi.__isInterface__ = true;
-auction_server_store_StoreApi.prototype = {
+var auction_common_model_api_ApiSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_common_model_api_ApiSchema.__name__ = "auction.common.model.api.ApiSchema";
+auction_common_model_api_ApiSchema.__super__ = stx_pico_Clazz;
+auction_common_model_api_ApiSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	mock: function() {
+		var bid = new auction_common_model_bid_BidMemoryModel();
+		var session = new auction_common_model_session_SessionMemoryModel();
+		var user = new auction_common_model_user_UserSchema().pull(session);
+		var saleable = auction_common_model_saleable_SaleableMockMemoryModel.pull();
+		var auction = auction_common_model_auction_AuctionMemoryModel.make(bid);
+		var pull = function(user,saleable) {
+			return new auction_common_model_api_ApiCls(user,session,auction,saleable,bid);
+		};
+		var api = stx_nano_Pledge.map(stx_nano_PledgeLift.zip(user,saleable),stx_nano_lift_LiftNano.decouple(stx_nano_Wildcard.__,pull));
+		return api;
+	}
+	,__class__: auction_common_model_api_ApiSchema
+});
+var auction_common_model_auction_AuctionId = {};
+auction_common_model_auction_AuctionId.toInt = function(this1) {
+	return this1;
+};
+auction_common_model_auction_AuctionId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_common_model_auction_AuctionId.toInt(_e);
+	}};
+};
+var stx_data_store_StoreApi = function() { };
+stx_data_store_StoreApi.__name__ = "stx.data.store.StoreApi";
+stx_data_store_StoreApi.__isInterface__ = true;
+stx_data_store_StoreApi.prototype = {
 	insert: null
 	,update: null
 	,'delete': null
 	,locate: null
 	,values: null
-	,__class__: auction_server_store_StoreApi
+	,__class__: stx_data_store_StoreApi
 };
-var auction_server_store_MemoryStore = function() {
+var stx_data_store_StoreInMemory = function() {
 	stx_pico_Clazz.call(this);
 	this.data = [];
 };
-auction_server_store_MemoryStore.__name__ = "auction.server.store.MemoryStore";
-auction_server_store_MemoryStore.__interfaces__ = [auction_server_store_StoreApi];
-auction_server_store_MemoryStore.__super__ = stx_pico_Clazz;
-auction_server_store_MemoryStore.prototype = $extend(stx_pico_Clazz.prototype,{
+stx_data_store_StoreInMemory.__name__ = "stx.data.store.StoreInMemory";
+stx_data_store_StoreInMemory.__interfaces__ = [stx_data_store_StoreApi];
+stx_data_store_StoreInMemory.__super__ = stx_pico_Clazz;
+stx_data_store_StoreInMemory.prototype = $extend(stx_pico_Clazz.prototype,{
 	data: null
 	,insert: function(v) {
 		this.data.push(v);
@@ -905,32 +783,44 @@ auction_server_store_MemoryStore.prototype = $extend(stx_pico_Clazz.prototype,{
 		var data = result.join(", ");
 		return "" + name + "(" + data + ")";
 	}
-	,__class__: auction_server_store_MemoryStore
+	,__class__: stx_data_store_StoreInMemory
 });
-var auction_server_auction_AuctionModelApi = function() { };
-auction_server_auction_AuctionModelApi.__name__ = "auction.server.auction.AuctionModelApi";
-auction_server_auction_AuctionModelApi.__isInterface__ = true;
-auction_server_auction_AuctionModelApi.__interfaces__ = [auction_server_store_StoreApi];
-auction_server_auction_AuctionModelApi.prototype = {
+var auction_common_model_store_StoreInMemory = function() {
+	stx_data_store_StoreInMemory.call(this);
+};
+auction_common_model_store_StoreInMemory.__name__ = "auction.common.model.store.StoreInMemory";
+auction_common_model_store_StoreInMemory.__super__ = stx_data_store_StoreInMemory;
+auction_common_model_store_StoreInMemory.prototype = $extend(stx_data_store_StoreInMemory.prototype,{
+	__class__: auction_common_model_store_StoreInMemory
+});
+var auction_common_model_store_StoreApi = function() { };
+auction_common_model_store_StoreApi.__name__ = "auction.common.model.store.StoreApi";
+auction_common_model_store_StoreApi.__isInterface__ = true;
+auction_common_model_store_StoreApi.__interfaces__ = [stx_data_store_StoreApi];
+var auction_common_model_auction_AuctionModelApi = function() { };
+auction_common_model_auction_AuctionModelApi.__name__ = "auction.common.model.auction.AuctionModelApi";
+auction_common_model_auction_AuctionModelApi.__isInterface__ = true;
+auction_common_model_auction_AuctionModelApi.__interfaces__ = [auction_common_model_store_StoreApi];
+auction_common_model_auction_AuctionModelApi.prototype = {
 	start: null
 	,place_bid: null
-	,__class__: auction_server_auction_AuctionModelApi
+	,__class__: auction_common_model_auction_AuctionModelApi
 };
-var auction_server_auction_AuctionMemoryModel = function(bids) {
-	auction_server_store_MemoryStore.call(this);
+var auction_common_model_auction_AuctionMemoryModel = function(bids) {
+	auction_common_model_store_StoreInMemory.call(this);
 	this.bids = bids;
 };
-auction_server_auction_AuctionMemoryModel.__name__ = "auction.server.auction.AuctionMemoryModel";
-auction_server_auction_AuctionMemoryModel.__interfaces__ = [auction_server_auction_AuctionModelApi];
-auction_server_auction_AuctionMemoryModel.make = function(bids) {
-	return new auction_server_auction_AuctionMemoryModel(bids);
+auction_common_model_auction_AuctionMemoryModel.__name__ = "auction.common.model.auction.AuctionMemoryModel";
+auction_common_model_auction_AuctionMemoryModel.__interfaces__ = [auction_common_model_auction_AuctionModelApi];
+auction_common_model_auction_AuctionMemoryModel.make = function(bids) {
+	return new auction_common_model_auction_AuctionMemoryModel(bids);
 };
-auction_server_auction_AuctionMemoryModel.__super__ = auction_server_store_MemoryStore;
-auction_server_auction_AuctionMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
+auction_common_model_auction_AuctionMemoryModel.__super__ = auction_common_model_store_StoreInMemory;
+auction_common_model_auction_AuctionMemoryModel.prototype = $extend(auction_common_model_store_StoreInMemory.prototype,{
 	bids: null
 	,start: function(id) {
 		var _gthis = this;
-		return stx_nano_Pledge.flat_map(this.locate(auction_server_auction_AuctionId.toInt(id)),function(auction) {
+		return stx_nano_Pledge.flat_map(this.locate(auction_common_model_auction_AuctionId.toInt(id)),function(auction) {
 			var tmp;
 			switch(auction._hx_index) {
 			case 0:
@@ -948,7 +838,7 @@ auction_server_auction_AuctionMemoryModel.prototype = $extend(auction_server_sto
 	}
 	,place_bid: function(id,bid) {
 		var _gthis = this;
-		return stx_nano_Pledge.flat_map(this.locate(auction_server_auction_AuctionId.toInt(id)),function(auction) {
+		return stx_nano_Pledge.flat_map(this.locate(auction_common_model_auction_AuctionId.toInt(id)),function(auction) {
 			var tmp;
 			switch(auction._hx_index) {
 			case 0:
@@ -961,71 +851,115 @@ auction_server_auction_AuctionMemoryModel.prototype = $extend(auction_server_sto
 				});
 				break;
 			case 1:
-				var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/auction/AuctionMemoryModel.hx", lineNumber : 35, className : "auction.server.auction.AuctionMemoryModel", methodName : "place_bid"});
+				var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/common/model/auction/AuctionMemoryModel.hx", lineNumber : 35, className : "auction.common.model.auction.AuctionMemoryModel", methodName : "place_bid"});
 				tmp = stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_NoSuchAuction)),haxe_ds_Option.None,this1)));
 				break;
 			}
 			return tmp;
 		});
 	}
-	,__class__: auction_server_auction_AuctionMemoryModel
+	,__class__: auction_common_model_auction_AuctionMemoryModel
 });
-var auction_server_auction_AuctionSchema = function() {
+var auction_common_model_auction_AuctionSchema = function() {
 	stx_pico_Clazz.call(this);
 };
-auction_server_auction_AuctionSchema.__name__ = "auction.server.auction.AuctionSchema";
-auction_server_auction_AuctionSchema.__super__ = stx_pico_Clazz;
-auction_server_auction_AuctionSchema.prototype = $extend(stx_pico_Clazz.prototype,{
-	__class__: auction_server_auction_AuctionSchema
+auction_common_model_auction_AuctionSchema.__name__ = "auction.common.model.auction.AuctionSchema";
+auction_common_model_auction_AuctionSchema.__super__ = stx_pico_Clazz;
+auction_common_model_auction_AuctionSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	make: function(saleable,duration,start_time,bids,id) {
+		return new auction_common_model_auction_AuctionVO(saleable,duration,start_time,bids,id);
+	}
+	,__class__: auction_common_model_auction_AuctionSchema
 });
-var auction_server_bid_Bid = function(user,item,bid,time,id) {
-	this.user = user;
-	this.item = item;
-	this.bid = bid;
-	this.time = time;
+var stx_data_store_UniqueKey = function() { };
+stx_data_store_UniqueKey.__name__ = "stx.data.store.UniqueKey";
+stx_data_store_UniqueKey.prototype = {
+	uid: null
+	,get_uid: null
+	,__class__: stx_data_store_UniqueKey
+	,__properties__: {get_uid:"get_uid"}
+};
+var auction_common_model_auction_AuctionVO = function(saleable,duration,start_time,bids,id) {
+	this.saleable = auction_common_model_saleable_SaleableId.toInt(saleable);
+	this.duration = duration;
+	this.start_time = start_time;
+	this.bids = bids;
 	this.id = id;
 };
-auction_server_bid_Bid.__name__ = "auction.server.bid.Bid";
-auction_server_bid_Bid.__super__ = auction_server_store_VO;
-auction_server_bid_Bid.prototype = $extend(auction_server_store_VO.prototype,{
-	user: null
-	,item: null
-	,bid: null
-	,time: null
+auction_common_model_auction_AuctionVO.__name__ = "auction.common.model.auction.AuctionVO";
+auction_common_model_auction_AuctionVO.__super__ = stx_data_store_UniqueKey;
+auction_common_model_auction_AuctionVO.prototype = $extend(stx_data_store_UniqueKey.prototype,{
+	clone: function() {
+		return new cloner_Cloner().clone(this);
+	}
+	,stamp: function() {
+		if(this.start_time > 0) {
+			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/common/model/auction/AuctionVO.hx", lineNumber : 16, className : "auction.common.model.auction.AuctionVO", methodName : "stamp"});
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF(stx_fail_AuctionFailure.E_AuctionFailed("already started"))),haxe_ds_Option.None,this1)));
+		} else {
+			var that = this.clone();
+			var hrtime = process.hrtime();
+			that.start_time = hrtime[0] + hrtime[1] / 1e9;
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,that));
+		}
+	}
+	,end_time: null
+	,get_end_time: function() {
+		var _gthis = this;
+		return stx_pico_OptionLift.map(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,this.start_time),function(f) {
+			return f + _gthis.duration;
+		});
+	}
+	,has_ended: function() {
+		var self = this.get_end_time();
+		switch(self._hx_index) {
+		case 0:
+			var t = self.v;
+			var hrtime = process.hrtime();
+			return hrtime[0] + hrtime[1] / 1e9 > t;
+		case 1:
+			return false;
+		}
+	}
+	,remaining_time: function() {
+		return stx_pico_OptionLift.map(this.get_end_time(),function(ok) {
+			var hrtime = process.hrtime();
+			return ok - (hrtime[0] + hrtime[1] / 1e9);
+		});
+	}
+	,saleable: null
+	,duration: null
+	,start_time: null
+	,bids: null
 	,id: null
 	,get_uid: function() {
 		return this.id;
 	}
-	,__class__: auction_server_bid_Bid
+	,__class__: auction_common_model_auction_AuctionVO
+	,__properties__: $extend(stx_data_store_UniqueKey.prototype.__properties__,{get_end_time:"get_end_time"})
 });
-var auction_server_bid_BidId = {};
-auction_server_bid_BidId.toInt = function(this1) {
+var auction_common_model_bid_BidId = {};
+auction_common_model_bid_BidId.toInt = function(this1) {
 	return this1;
 };
-auction_server_bid_BidId.toIntKey = function(this1) {
-	var _e = this1;
-	return { toInt : function() {
-		return auction_server_bid_BidId.toInt(_e);
-	}};
+var auction_common_model_bid_BidModelApi = function() { };
+auction_common_model_bid_BidModelApi.__name__ = "auction.common.model.bid.BidModelApi";
+auction_common_model_bid_BidModelApi.__isInterface__ = true;
+auction_common_model_bid_BidModelApi.__interfaces__ = [auction_common_model_store_StoreApi];
+var auction_common_model_bid_BidMemoryModel = function() {
+	auction_common_model_store_StoreInMemory.call(this);
 };
-var auction_server_bid_BidModelApi = function() { };
-auction_server_bid_BidModelApi.__name__ = "auction.server.bid.BidModelApi";
-auction_server_bid_BidModelApi.__isInterface__ = true;
-auction_server_bid_BidModelApi.__interfaces__ = [auction_server_store_StoreApi];
-var auction_server_bid_BidMemoryModel = function() {
-	auction_server_store_MemoryStore.call(this);
-};
-auction_server_bid_BidMemoryModel.__name__ = "auction.server.bid.BidMemoryModel";
-auction_server_bid_BidMemoryModel.__interfaces__ = [auction_server_bid_BidModelApi];
-auction_server_bid_BidMemoryModel.__super__ = auction_server_store_MemoryStore;
-auction_server_bid_BidMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
-	__class__: auction_server_bid_BidMemoryModel
+auction_common_model_bid_BidMemoryModel.__name__ = "auction.common.model.bid.BidMemoryModel";
+auction_common_model_bid_BidMemoryModel.__interfaces__ = [auction_common_model_bid_BidModelApi];
+auction_common_model_bid_BidMemoryModel.__super__ = auction_common_model_store_StoreInMemory;
+auction_common_model_bid_BidMemoryModel.prototype = $extend(auction_common_model_store_StoreInMemory.prototype,{
+	__class__: auction_common_model_bid_BidMemoryModel
 });
-var auction_server_pack_Counter = function() {
+var auction_common_pack_Counter = function() {
 	this.value = 0;
 };
-auction_server_pack_Counter.__name__ = "auction.server.pack.Counter";
-auction_server_pack_Counter.prototype = {
+auction_common_pack_Counter.__name__ = "auction.common.pack.Counter";
+auction_common_pack_Counter.prototype = {
 	value: null
 	,next: function() {
 		var result = this.value;
@@ -1041,14 +975,14 @@ auction_server_pack_Counter.prototype = {
 			return length > 0;
 		}}};
 	}
-	,__class__: auction_server_pack_Counter
+	,__class__: auction_common_pack_Counter
 };
-var auction_server_bid_BidSchema = function() {
+var auction_common_model_bid_BidSchema = function() {
 	stx_pico_Clazz.call(this);
 };
-auction_server_bid_BidSchema.__name__ = "auction.server.bid.BidSchema";
-auction_server_bid_BidSchema.__super__ = stx_pico_Clazz;
-auction_server_bid_BidSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+auction_common_model_bid_BidSchema.__name__ = "auction.common.model.bid.BidSchema";
+auction_common_model_bid_BidSchema.__super__ = stx_pico_Clazz;
+auction_common_model_bid_BidSchema.prototype = $extend(stx_pico_Clazz.prototype,{
 	make: function(user,item,bid,time,id) {
 		var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,id);
 		var tmp;
@@ -1056,47 +990,397 @@ auction_server_bid_BidSchema.prototype = $extend(stx_pico_Clazz.prototype,{
 			var v = self.v;
 			tmp = v;
 		} else {
-			tmp = auction_server_bid_BidSchema.counter.next();
+			tmp = auction_common_model_bid_BidSchema.counter.next();
 		}
-		return new auction_server_bid_Bid(user,item,bid,time,tmp);
+		return new auction_common_model_bid_BidVO(user,item,bid,time,tmp);
 	}
-	,__class__: auction_server_bid_BidSchema
+	,__class__: auction_common_model_bid_BidSchema
 });
-var auction_server_context_ContextApi = function() { };
-auction_server_context_ContextApi.__name__ = "auction.server.context.ContextApi";
-auction_server_context_ContextApi.__isInterface__ = true;
-auction_server_context_ContextApi.prototype = {
-	api: null
-	,__class__: auction_server_context_ContextApi
+var auction_common_model_bid_BidVO = function(user,item,bid,time,id) {
+	this.user = user;
+	this.item = item;
+	this.bid = bid;
+	this.time = time;
+	this.id = id;
 };
-var auction_server_context_ContextCls = function(api) {
+auction_common_model_bid_BidVO.__name__ = "auction.common.model.bid.BidVO";
+auction_common_model_bid_BidVO.__super__ = stx_data_store_UniqueKey;
+auction_common_model_bid_BidVO.prototype = $extend(stx_data_store_UniqueKey.prototype,{
+	user: null
+	,item: null
+	,bid: null
+	,time: null
+	,id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_common_model_bid_BidVO
+});
+var auction_common_model_context_ContextApi = function() { };
+auction_common_model_context_ContextApi.__name__ = "auction.common.model.context.ContextApi";
+auction_common_model_context_ContextApi.__isInterface__ = true;
+auction_common_model_context_ContextApi.prototype = {
+	api: null
+	,__class__: auction_common_model_context_ContextApi
+};
+var auction_common_model_context_ContextCls = function(api) {
 	this.api = api;
 };
-auction_server_context_ContextCls.__name__ = "auction.server.context.ContextCls";
-auction_server_context_ContextCls.__interfaces__ = [auction_server_context_ContextApi];
-auction_server_context_ContextCls.prototype = {
+auction_common_model_context_ContextCls.__name__ = "auction.common.model.context.ContextCls";
+auction_common_model_context_ContextCls.__interfaces__ = [auction_common_model_context_ContextApi];
+auction_common_model_context_ContextCls.prototype = {
 	api: null
-	,__class__: auction_server_context_ContextCls
+	,__class__: auction_common_model_context_ContextCls
 };
-var auction_server_context_ContextSchema = function() {
+var auction_common_model_context_ContextSchema = function() {
 	stx_pico_Clazz.call(this);
 };
-auction_server_context_ContextSchema.__name__ = "auction.server.context.ContextSchema";
-auction_server_context_ContextSchema.__super__ = stx_pico_Clazz;
-auction_server_context_ContextSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+auction_common_model_context_ContextSchema.__name__ = "auction.common.model.context.ContextSchema";
+auction_common_model_context_ContextSchema.__super__ = stx_pico_Clazz;
+auction_common_model_context_ContextSchema.prototype = $extend(stx_pico_Clazz.prototype,{
 	mock: function() {
-		var bid = new auction_server_bid_BidMemoryModel();
-		var session = new auction_server_session_SessionMemoryModel();
-		var user = new auction_server_user_UserSchema().pull(session);
-		var saleable = auction_server_saleable_SaleableMockMemoryModel.pull();
-		var auction = auction_server_auction_AuctionMemoryModel.make(bid);
-		var pull = function(user,saleable) {
-			return new auction_server_context_ContextCls(new auction_server_api_ApiCls(user,session,auction,saleable,bid));
-		};
-		var context = stx_nano_Pledge.map(stx_nano_PledgeLift.zip(user,saleable),stx_nano_lift_LiftNano.decouple(stx_nano_Wildcard.__,pull));
-		return context;
+		return stx_nano_Pledge.map(new auction_common_model_api_ApiSchema().mock(),function(api) {
+			return new auction_common_model_context_ContextCls(api);
+		});
 	}
-	,__class__: auction_server_context_ContextSchema
+	,__class__: auction_common_model_context_ContextSchema
+});
+var auction_common_model_saleable_SaleableId = {};
+auction_common_model_saleable_SaleableId.toInt = function(this1) {
+	return this1;
+};
+var auction_common_model_saleable_SaleableModelApi = function() { };
+auction_common_model_saleable_SaleableModelApi.__name__ = "auction.common.model.saleable.SaleableModelApi";
+auction_common_model_saleable_SaleableModelApi.__isInterface__ = true;
+auction_common_model_saleable_SaleableModelApi.__interfaces__ = [auction_common_model_store_StoreApi];
+var auction_common_model_saleable_SaleableMemoryModel = function() {
+	auction_common_model_store_StoreInMemory.call(this);
+};
+auction_common_model_saleable_SaleableMemoryModel.__name__ = "auction.common.model.saleable.SaleableMemoryModel";
+auction_common_model_saleable_SaleableMemoryModel.__interfaces__ = [auction_common_model_saleable_SaleableModelApi];
+auction_common_model_saleable_SaleableMemoryModel.__super__ = auction_common_model_store_StoreInMemory;
+auction_common_model_saleable_SaleableMemoryModel.prototype = $extend(auction_common_model_store_StoreInMemory.prototype,{
+	__class__: auction_common_model_saleable_SaleableMemoryModel
+});
+var auction_common_model_saleable_SaleableMockMemoryModel = function() {
+	auction_common_model_saleable_SaleableMemoryModel.call(this);
+};
+auction_common_model_saleable_SaleableMockMemoryModel.__name__ = "auction.common.model.saleable.SaleableMockMemoryModel";
+auction_common_model_saleable_SaleableMockMemoryModel.pull = function() {
+	var model = new auction_common_model_saleable_SaleableMockMemoryModel();
+	if(!stx_nano_Resource.exists("saleables")) {
+		var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/common/model/saleable/SaleableMockMemoryModel.hx", lineNumber : 8, className : "auction.common.model.saleable.SaleableMockMemoryModel", methodName : "pull"});
+		throw haxe_Exception.thrown(new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF("E_ResourceNotFound")),haxe_ds_Option.None,this1));
+	}
+	var this1 = "saleables";
+	var resource = JSON.parse(stx_nano_Resource.string(this1));
+	var data = [];
+	var _g = 0;
+	var _g1 = resource.data;
+	while(_g < _g1.length) {
+		var item = _g1[_g];
+		++_g;
+		var next = new auction_common_model_saleable_SaleableSchema().make(item.name,item.description,item.img,item.id);
+		data.push(next);
+	}
+	var fn = function(next,memo) {
+		return stx_nano_Pledge.map(model.insert(next),function(_) {
+			return memo;
+		});
+	};
+	return stx_nano_Pledge.bind_fold(data,fn,model);
+};
+auction_common_model_saleable_SaleableMockMemoryModel.__super__ = auction_common_model_saleable_SaleableMemoryModel;
+auction_common_model_saleable_SaleableMockMemoryModel.prototype = $extend(auction_common_model_saleable_SaleableMemoryModel.prototype,{
+	__class__: auction_common_model_saleable_SaleableMockMemoryModel
+});
+var auction_common_model_saleable_SaleableSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_common_model_saleable_SaleableSchema.__name__ = "auction.common.model.saleable.SaleableSchema";
+auction_common_model_saleable_SaleableSchema.__super__ = stx_pico_Clazz;
+auction_common_model_saleable_SaleableSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	make: function(name,description,img,id) {
+		return new auction_common_model_saleable_SaleableVO(name,description,img,id);
+	}
+	,__class__: auction_common_model_saleable_SaleableSchema
+});
+var auction_common_model_saleable_SaleableVO = function(name,description,img,id) {
+	this.name = name;
+	this.description = description;
+	this.img = img;
+	this.id = id;
+};
+auction_common_model_saleable_SaleableVO.__name__ = "auction.common.model.saleable.SaleableVO";
+auction_common_model_saleable_SaleableVO.__super__ = stx_data_store_UniqueKey;
+auction_common_model_saleable_SaleableVO.prototype = $extend(stx_data_store_UniqueKey.prototype,{
+	name: null
+	,description: null
+	,img: null
+	,id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_common_model_saleable_SaleableVO
+});
+var auction_common_model_session_SessionId = {};
+auction_common_model_session_SessionId.toInt = function(this1) {
+	return this1;
+};
+auction_common_model_session_SessionId.toIntKey = function(this1) {
+	var _e = this1;
+	return { toInt : function() {
+		return auction_common_model_session_SessionId.toInt(_e);
+	}};
+};
+var auction_common_model_session_SessionModelApi = function() { };
+auction_common_model_session_SessionModelApi.__name__ = "auction.common.model.session.SessionModelApi";
+auction_common_model_session_SessionModelApi.__isInterface__ = true;
+auction_common_model_session_SessionModelApi.__interfaces__ = [auction_common_model_store_StoreApi];
+var auction_common_model_session_SessionMemoryModel = function() {
+	auction_common_model_store_StoreInMemory.call(this);
+};
+auction_common_model_session_SessionMemoryModel.__name__ = "auction.common.model.session.SessionMemoryModel";
+auction_common_model_session_SessionMemoryModel.__interfaces__ = [auction_common_model_session_SessionModelApi];
+auction_common_model_session_SessionMemoryModel.__super__ = auction_common_model_store_StoreInMemory;
+auction_common_model_session_SessionMemoryModel.prototype = $extend(auction_common_model_store_StoreInMemory.prototype,{
+	__class__: auction_common_model_session_SessionMemoryModel
+});
+var auction_common_model_session_SessionSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_common_model_session_SessionSchema.__name__ = "auction.common.model.session.SessionSchema";
+auction_common_model_session_SessionSchema.__super__ = stx_pico_Clazz;
+auction_common_model_session_SessionSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	mock_memory: function() {
+		return new auction_common_model_session_SessionMemoryModel();
+	}
+	,create: function(user) {
+		var tmp = auction_common_model_session_SessionSchema.counter.next();
+		var hrtime = process.hrtime();
+		return new auction_common_model_session_SessionVO(tmp,hrtime[0] + hrtime[1] / 1e9,user);
+	}
+	,__class__: auction_common_model_session_SessionSchema
+});
+var auction_common_model_session_SessionVO = function(id,start_time,user) {
+	this.id = auction_common_model_session_SessionId.toInt(id);
+	this.start_time = start_time;
+	this.user = auction_common_model_user_UserId.toInt(user);
+};
+auction_common_model_session_SessionVO.__name__ = "auction.common.model.session.SessionVO";
+auction_common_model_session_SessionVO.__super__ = stx_data_store_UniqueKey;
+auction_common_model_session_SessionVO.prototype = $extend(stx_data_store_UniqueKey.prototype,{
+	id: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,user: null
+	,start_time: null
+	,__class__: auction_common_model_session_SessionVO
+});
+var auction_common_model_user_UserId = {};
+auction_common_model_user_UserId.toInt = function(this1) {
+	return this1;
+};
+var auction_common_model_user_UserModelApi = function() { };
+auction_common_model_user_UserModelApi.__name__ = "auction.common.model.user.UserModelApi";
+auction_common_model_user_UserModelApi.__isInterface__ = true;
+auction_common_model_user_UserModelApi.__interfaces__ = [auction_common_model_store_StoreApi];
+auction_common_model_user_UserModelApi.prototype = {
+	sign_in: null
+	,__class__: auction_common_model_user_UserModelApi
+};
+var auction_common_model_user_UserMockMemoryModel = function(session) {
+	auction_common_model_store_StoreInMemory.call(this);
+	this.session = session;
+};
+auction_common_model_user_UserMockMemoryModel.__name__ = "auction.common.model.user.UserMockMemoryModel";
+auction_common_model_user_UserMockMemoryModel.__interfaces__ = [auction_common_model_user_UserModelApi];
+auction_common_model_user_UserMockMemoryModel.__super__ = auction_common_model_store_StoreInMemory;
+auction_common_model_user_UserMockMemoryModel.prototype = $extend(auction_common_model_store_StoreInMemory.prototype,{
+	session: null
+	,sign_in: function(credentials) {
+		var _gthis = this;
+		var user = stx_lift_ArrayLift.search(this.data,function(user) {
+			return user.name == credentials.name;
+		});
+		var pass;
+		switch(user._hx_index) {
+		case 0:
+			var t = user.v;
+			pass = t.pass == credentials.pass;
+			break;
+		case 1:
+			pass = false;
+			break;
+		}
+		return stx_nano_lift_LiftNano.if_else(pass,function() {
+			var u = stx_pico_OptionLift.fudge(user);
+			var s = new auction_common_model_session_SessionSchema().create(u.get_uid());
+			return stx_nano_Pledge.flat_map(_gthis.session.insert(s),function(_) {
+				var next = u.clone();
+				next.sessions.push(s.get_uid());
+				return stx_nano_Pledge.map(_gthis.update(u),function(_) {
+					return true;
+				});
+			});
+		},function() {
+			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,false));
+		});
+	}
+	,__class__: auction_common_model_user_UserMockMemoryModel
+});
+var auction_common_model_user_UserSchema = function() {
+	stx_pico_Clazz.call(this);
+};
+auction_common_model_user_UserSchema.__name__ = "auction.common.model.user.UserSchema";
+auction_common_model_user_UserSchema.__super__ = stx_pico_Clazz;
+auction_common_model_user_UserSchema.prototype = $extend(stx_pico_Clazz.prototype,{
+	make: function(name,pass,id,role,bids,sessions) {
+		return new auction_common_model_user_UserVO(name,pass,id,role,bids,sessions);
+	}
+	,mock: function() {
+		var users = [];
+		if(!stx_nano_Resource.exists("users")) {
+			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/common/model/user/UserSchema.hx", lineNumber : 9, className : "auction.common.model.user.UserSchema", methodName : "mock"});
+			throw haxe_Exception.thrown(new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF("E_ResourceNotFound")),haxe_ds_Option.None,this1));
+		}
+		var this1 = "users";
+		var input = JSON.parse(stx_nano_Resource.string(this1)).data;
+		var _g = 0;
+		while(_g < input.length) {
+			var x = input[_g];
+			++_g;
+			var data = new auction_common_model_user_UserVO(x.name,x.pass,x.id,x.role,[],[]);
+			users.push(data);
+		}
+		return users;
+	}
+	,pull: function(session) {
+		var users = this.mock();
+		var collection = new auction_common_model_user_UserMockMemoryModel(session);
+		return stx_nano_Pledge.bind_fold(users,function(next,memo) {
+			return stx_nano_Pledge.map(collection.insert(next),function(_) {
+				return collection;
+			});
+		},collection);
+	}
+	,__class__: auction_common_model_user_UserSchema
+});
+var auction_common_model_user_UserVO = function(name,pass,id,role,bids,sessions) {
+	this.name = name;
+	this.pass = pass;
+	this.role = role;
+	this.id = id;
+	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,bids);
+	var tmp;
+	if(self._hx_index == 0) {
+		var v = self.v;
+		tmp = v;
+	} else {
+		tmp = [];
+	}
+	this.bids = tmp;
+	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,sessions);
+	var tmp;
+	if(self._hx_index == 0) {
+		var v = self.v;
+		tmp = v;
+	} else {
+		tmp = [];
+	}
+	this.sessions = tmp;
+};
+auction_common_model_user_UserVO.__name__ = "auction.common.model.user.UserVO";
+auction_common_model_user_UserVO.__super__ = stx_data_store_UniqueKey;
+auction_common_model_user_UserVO.prototype = $extend(stx_data_store_UniqueKey.prototype,{
+	clone: function() {
+		return new cloner_Cloner().clone(this);
+	}
+	,id: null
+	,name: null
+	,pass: null
+	,bids: null
+	,sessions: null
+	,role: null
+	,get_uid: function() {
+		return this.id;
+	}
+	,__class__: auction_common_model_user_UserVO
+});
+var auction_server_GolgiExpressPath = {};
+auction_server_GolgiExpressPath._new = function(self) {
+	var this1 = self;
+	return this1;
+};
+auction_server_GolgiExpressPath.fromRequest = function(self) {
+	var arr = self.path.split("/");
+	arr.shift();
+	return auction_server_GolgiExpressPath._new(arr);
+};
+var auction_server_HandlerLift = function() { };
+auction_server_HandlerLift.__name__ = "auction.server.HandlerLift";
+auction_server_HandlerLift.apply = function(context,router,req,res,next) {
+	var path = auction_server_GolgiExpressPath.fromRequest(req);
+	try {
+		var operation = router.route(path,null,req);
+		if(operation._hx_index == 2) {
+			var _g = operation.result;
+			var home = "" + process.cwd() + "/templates/home.html";
+			res.sendFile(home);
+		} else {
+			next();
+		}
+	} catch( _g ) {
+		haxe_NativeStackTrace.lastError = _g;
+		var _g1 = haxe_Exception.caught(_g).unwrap();
+		if(js_Boot.__instanceof(_g1,golgi_Error)) {
+			var e = _g1;
+			next(e);
+		} else {
+			throw _g;
+		}
+	}
+};
+var auction_server_Handler = {};
+auction_server_Handler._new = function(context,router) {
+	var context1 = context;
+	var router1 = router;
+	var this1 = function(req,res,next) {
+		auction_server_Handler._.apply(context1,router1,req,res,next);
+	};
+	return this1;
+};
+var auction_server_Test = function() { };
+auction_server_Test.__name__ = "auction.server.Test";
+auction_server_Test.main = function() {
+	stx_Test.test([new auction_server_test_SaleableTest(),new auction_server_test_AuctionTest(),new auction_server_MacroNotClashTest(),new auction_server_test_TinkPureTest(),new auction_server_test_StoreInMemoryTest(),new auction_server_test_UserTest(),new auction_server_test_RouterTest()],[auction_server_test_RouterTest]);
+};
+var utest_ITest = function() { };
+utest_ITest.__name__ = "utest.ITest";
+utest_ITest.__isInterface__ = true;
+var utest_Test = function() {
+};
+utest_Test.__name__ = "utest.Test";
+utest_Test.__interfaces__ = [utest_ITest];
+utest_Test.prototype = {
+	__initializeUtest__: function() {
+		var init = { tests : [], dependencies : [], accessories : { }};
+		return init;
+	}
+	,__class__: utest_Test
+};
+var auction_server_MacroNotClashTest = function() {
+	utest_Test.call(this);
+};
+auction_server_MacroNotClashTest.__name__ = "auction.server.MacroNotClashTest";
+auction_server_MacroNotClashTest.__super__ = utest_Test;
+auction_server_MacroNotClashTest.prototype = $extend(utest_Test.prototype,{
+	__initializeUtest__: function() {
+		var init = utest_Test.prototype.__initializeUtest__.call(this);
+		return init;
+	}
+	,__class__: auction_server_MacroNotClashTest
 });
 var golgi_Golgi = function(api,meta) {
 	this.api = api;
@@ -1375,142 +1659,6 @@ auction_server_router_api_user_Routes.__super__ = golgi_Api;
 auction_server_router_api_user_Routes.prototype = $extend(golgi_Api.prototype,{
 	__class__: auction_server_router_api_user_Routes
 });
-var auction_server_saleable_Saleable = function(name,description,img,id) {
-	this.name = name;
-	this.description = description;
-	this.img = img;
-	this.id = id;
-};
-auction_server_saleable_Saleable.__name__ = "auction.server.saleable.Saleable";
-auction_server_saleable_Saleable.make = function(name,description,img,id) {
-	return new auction_server_saleable_Saleable(name,description,img,id);
-};
-auction_server_saleable_Saleable.__super__ = auction_server_store_VO;
-auction_server_saleable_Saleable.prototype = $extend(auction_server_store_VO.prototype,{
-	name: null
-	,description: null
-	,img: null
-	,id: null
-	,get_uid: function() {
-		return this.id;
-	}
-	,__class__: auction_server_saleable_Saleable
-});
-var auction_server_saleable_SaleableId = {};
-auction_server_saleable_SaleableId.toInt = function(this1) {
-	return this1;
-};
-auction_server_saleable_SaleableId.toIntKey = function(this1) {
-	var _e = this1;
-	return { toInt : function() {
-		return auction_server_saleable_SaleableId.toInt(_e);
-	}};
-};
-var auction_server_saleable_SaleableModelApi = function() { };
-auction_server_saleable_SaleableModelApi.__name__ = "auction.server.saleable.SaleableModelApi";
-auction_server_saleable_SaleableModelApi.__isInterface__ = true;
-auction_server_saleable_SaleableModelApi.__interfaces__ = [auction_server_store_StoreApi];
-var auction_server_saleable_SaleableMemoryModel = function() {
-	auction_server_store_MemoryStore.call(this);
-};
-auction_server_saleable_SaleableMemoryModel.__name__ = "auction.server.saleable.SaleableMemoryModel";
-auction_server_saleable_SaleableMemoryModel.__interfaces__ = [auction_server_saleable_SaleableModelApi];
-auction_server_saleable_SaleableMemoryModel.__super__ = auction_server_store_MemoryStore;
-auction_server_saleable_SaleableMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
-	__class__: auction_server_saleable_SaleableMemoryModel
-});
-var auction_server_saleable_SaleableMockMemoryModel = function() {
-	auction_server_saleable_SaleableMemoryModel.call(this);
-};
-auction_server_saleable_SaleableMockMemoryModel.__name__ = "auction.server.saleable.SaleableMockMemoryModel";
-auction_server_saleable_SaleableMockMemoryModel.pull = function() {
-	var model = new auction_server_saleable_SaleableMockMemoryModel();
-	if(!stx_nano_Resource.exists("saleables")) {
-		var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/saleable/SaleableMockMemoryModel.hx", lineNumber : 8, className : "auction.server.saleable.SaleableMockMemoryModel", methodName : "pull"});
-		throw haxe_Exception.thrown(new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF("E_ResourceNotFound")),haxe_ds_Option.None,this1));
-	}
-	var this1 = "saleables";
-	var resource = JSON.parse(stx_nano_Resource.string(this1));
-	var data = [];
-	var _g = 0;
-	var _g1 = resource.data;
-	while(_g < _g1.length) {
-		var item = _g1[_g];
-		++_g;
-		var next = auction_server_saleable_Saleable.make(item.name,item.description,item.img,item.id);
-		data.push(next);
-	}
-	var fn = function(next,memo) {
-		return stx_nano_Pledge.map(model.insert(next),function(_) {
-			return memo;
-		});
-	};
-	return stx_nano_Pledge.bind_fold(data,fn,model);
-};
-auction_server_saleable_SaleableMockMemoryModel.__super__ = auction_server_saleable_SaleableMemoryModel;
-auction_server_saleable_SaleableMockMemoryModel.prototype = $extend(auction_server_saleable_SaleableMemoryModel.prototype,{
-	__class__: auction_server_saleable_SaleableMockMemoryModel
-});
-var auction_server_session_Session = function(id,start_time,user) {
-	this.id = auction_server_session_SessionId.toInt(id);
-	this.start_time = start_time;
-	this.user = auction_server_user_UserId.toInt(user);
-};
-auction_server_session_Session.__name__ = "auction.server.session.Session";
-auction_server_session_Session.pure = function(id) {
-	var tmp = auction_server_session_Session.counter.next();
-	var hrtime = process.hrtime();
-	return new auction_server_session_Session(tmp,hrtime[0] + hrtime[1] / 1e9,id);
-};
-auction_server_session_Session.__super__ = auction_server_store_VO;
-auction_server_session_Session.prototype = $extend(auction_server_store_VO.prototype,{
-	id: null
-	,get_uid: function() {
-		return this.id;
-	}
-	,user: null
-	,start_time: null
-	,__class__: auction_server_session_Session
-});
-var auction_server_session_SessionId = {};
-auction_server_session_SessionId.toInt = function(this1) {
-	return this1;
-};
-auction_server_session_SessionId.toIntKey = function(this1) {
-	var _e = this1;
-	return { toInt : function() {
-		return auction_server_session_SessionId.toInt(_e);
-	}};
-};
-var auction_server_session_SessionModelApi = function() { };
-auction_server_session_SessionModelApi.__name__ = "auction.server.session.SessionModelApi";
-auction_server_session_SessionModelApi.__isInterface__ = true;
-auction_server_session_SessionModelApi.__interfaces__ = [auction_server_store_StoreApi];
-var auction_server_session_SessionMemoryModel = function() {
-	auction_server_store_MemoryStore.call(this);
-};
-auction_server_session_SessionMemoryModel.__name__ = "auction.server.session.SessionMemoryModel";
-auction_server_session_SessionMemoryModel.__interfaces__ = [auction_server_session_SessionModelApi];
-auction_server_session_SessionMemoryModel.__super__ = auction_server_store_MemoryStore;
-auction_server_session_SessionMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
-	__class__: auction_server_session_SessionMemoryModel
-});
-var auction_server_session_SessionSchema = function() {
-	stx_pico_Clazz.call(this);
-};
-auction_server_session_SessionSchema.__name__ = "auction.server.session.SessionSchema";
-auction_server_session_SessionSchema.__super__ = stx_pico_Clazz;
-auction_server_session_SessionSchema.prototype = $extend(stx_pico_Clazz.prototype,{
-	mock_memory: function() {
-		return new auction_server_session_SessionMemoryModel();
-	}
-	,create: function(user) {
-		var tmp = auction_server_session_SessionSchema.counter.next();
-		var hrtime = process.hrtime();
-		return new auction_server_session_Session(tmp,hrtime[0] + hrtime[1] / 1e9,user);
-	}
-	,__class__: auction_server_session_SessionSchema
-});
 var auction_server_test_AuctionTest = function() {
 	utest_Test.call(this);
 };
@@ -1518,9 +1666,9 @@ auction_server_test_AuctionTest.__name__ = "auction.server.test.AuctionTest";
 auction_server_test_AuctionTest.__super__ = utest_Test;
 auction_server_test_AuctionTest.prototype = $extend(utest_Test.prototype,{
 	test_immutability: function() {
-		var bid_model = new auction_server_bid_BidMemoryModel();
-		var auction_model = new auction_server_auction_AuctionMemoryModel(bid_model);
-		var auction = auction_server_auction_Auction.make(1,10000,-999.9,[],0);
+		var bid_model = new auction_common_model_bid_BidMemoryModel();
+		var auction_model = new auction_common_model_auction_AuctionMemoryModel(bid_model);
+		var auction = new auction_common_model_auction_AuctionSchema().make(1,10000,-999.9,[],0);
 		var self = stx_nano_PledgeLift.fudge(auction.stamp());
 		switch(self._hx_index) {
 		case 0:
@@ -1544,8 +1692,8 @@ auction_server_test_AuctionTest.prototype = $extend(utest_Test.prototype,{
 			throw haxe_Exception.thrown(e);
 		}
 		utest_Assert.same([0],tmp,null,null,null,{ fileName : "src/main/haxe/auction/server/test/AuctionTest.hx", lineNumber : 20, className : "auction.server.test.AuctionTest", methodName : "test_immutability"});
-		var session_model = new auction_server_session_SessionMemoryModel();
-		var self = stx_nano_PledgeLift.fudge(new auction_server_user_UserSchema().pull(session_model));
+		var session_model = new auction_common_model_session_SessionMemoryModel();
+		var self = stx_nano_PledgeLift.fudge(new auction_common_model_user_UserSchema().pull(session_model));
 		var user_model;
 		switch(self._hx_index) {
 		case 0:
@@ -1568,7 +1716,7 @@ auction_server_test_AuctionTest.prototype = $extend(utest_Test.prototype,{
 			throw haxe_Exception.thrown(e);
 		}
 		var user1 = stx_pico_OptionLift.fudge(user);
-		var bid = new auction_server_bid_BidSchema();
+		var bid = new auction_common_model_bid_BidSchema();
 		var bid1 = user1.get_uid();
 		var bid2 = auction.get_uid();
 		var hrtime = process.hrtime();
@@ -1578,13 +1726,13 @@ auction_server_test_AuctionTest.prototype = $extend(utest_Test.prototype,{
 		haxe_Log.trace(auction_model.data,{ fileName : "src/main/haxe/auction/server/test/AuctionTest.hx", lineNumber : 31, className : "auction.server.test.AuctionTest", methodName : "test_immutability"});
 	}
 	,_test: function() {
-		var bid = new auction_server_bid_BidMemoryModel();
-		var session = new auction_server_session_SessionMemoryModel();
-		var user = new auction_server_user_UserSchema().pull(session);
-		var saleable = auction_server_saleable_SaleableMockMemoryModel.pull();
-		var auction = auction_server_auction_AuctionMemoryModel.make(bid);
+		var bid = new auction_common_model_bid_BidMemoryModel();
+		var session = new auction_common_model_session_SessionMemoryModel();
+		var user = new auction_common_model_user_UserSchema().pull(session);
+		var saleable = auction_common_model_saleable_SaleableMockMemoryModel.pull();
+		var auction = auction_common_model_auction_AuctionMemoryModel.make(bid);
 		var pull = function(user,saleable) {
-			return new auction_server_context_ContextCls(new auction_server_api_ApiCls(user,session,auction,saleable,bid));
+			return new auction_common_model_context_ContextCls(new auction_common_model_api_ApiCls(user,session,auction,saleable,bid));
 		};
 		var context = stx_nano_Pledge.map(stx_nano_PledgeLift.zip(user,saleable),stx_nano_lift_LiftNano.decouple(stx_nano_Wildcard.__,pull));
 	}
@@ -1599,38 +1747,6 @@ auction_server_test_AuctionTest.prototype = $extend(utest_Test.prototype,{
 	}
 	,__class__: auction_server_test_AuctionTest
 });
-var auction_server_test_NoiseMemoryStore = function() {
-	auction_server_store_MemoryStore.call(this);
-};
-auction_server_test_NoiseMemoryStore.__name__ = "auction.server.test.NoiseMemoryStore";
-auction_server_test_NoiseMemoryStore.__super__ = auction_server_store_MemoryStore;
-auction_server_test_NoiseMemoryStore.prototype = $extend(auction_server_store_MemoryStore.prototype,{
-	__class__: auction_server_test_NoiseMemoryStore
-});
-var auction_server_test_MemoryStoreTest = function() {
-	utest_Test.call(this);
-};
-auction_server_test_MemoryStoreTest.__name__ = "auction.server.test.MemoryStoreTest";
-auction_server_test_MemoryStoreTest.__super__ = utest_Test;
-auction_server_test_MemoryStoreTest.prototype = $extend(utest_Test.prototype,{
-	test: function() {
-		var store = new auction_server_test_NoiseMemoryStore();
-		var r0 = store.insert({ id : 0});
-		stx_nano_Pledge.prj(r0).handle(function(_) {
-			utest_Assert.equals(1,store.data.length,null,{ fileName : "src/main/haxe/auction/server/test/MemoryStoreTest.hx", lineNumber : 11, className : "auction.server.test.MemoryStoreTest", methodName : "test"});
-		});
-	}
-	,__initializeUtest__: function() {
-		var _gthis = this;
-		var init = utest_Test.prototype.__initializeUtest__.call(this);
-		init.tests.push({ name : "test", dependencies : [], execute : function() {
-			_gthis.test();
-			return utest_Async.getResolved();
-		}});
-		return init;
-	}
-	,__class__: auction_server_test_MemoryStoreTest
-});
 var auction_server_test_RouterTest = function() {
 	utest_Test.call(this);
 };
@@ -1638,7 +1754,7 @@ auction_server_test_RouterTest.__name__ = "auction.server.test.RouterTest";
 auction_server_test_RouterTest.__super__ = utest_Test;
 auction_server_test_RouterTest.prototype = $extend(utest_Test.prototype,{
 	test: function() {
-		var self = stx_nano_PledgeLift.fudge(new auction_server_context_ContextSchema().mock());
+		var self = stx_nano_PledgeLift.fudge(new auction_common_model_context_ContextSchema().mock());
 		var context;
 		switch(self._hx_index) {
 		case 0:
@@ -1672,7 +1788,7 @@ auction_server_test_SaleableTest.__name__ = "auction.server.test.SaleableTest";
 auction_server_test_SaleableTest.__super__ = utest_Test;
 auction_server_test_SaleableTest.prototype = $extend(utest_Test.prototype,{
 	test: function() {
-		var model = auction_server_saleable_SaleableMockMemoryModel.pull();
+		var model = auction_common_model_saleable_SaleableMockMemoryModel.pull();
 		var value = stx_nano_PledgeLift.fudge(model);
 	}
 	,__initializeUtest__: function() {
@@ -1685,6 +1801,38 @@ auction_server_test_SaleableTest.prototype = $extend(utest_Test.prototype,{
 		return init;
 	}
 	,__class__: auction_server_test_SaleableTest
+});
+var auction_server_test_NoiseStoreInMemory = function() {
+	stx_data_store_StoreInMemory.call(this);
+};
+auction_server_test_NoiseStoreInMemory.__name__ = "auction.server.test.NoiseStoreInMemory";
+auction_server_test_NoiseStoreInMemory.__super__ = stx_data_store_StoreInMemory;
+auction_server_test_NoiseStoreInMemory.prototype = $extend(stx_data_store_StoreInMemory.prototype,{
+	__class__: auction_server_test_NoiseStoreInMemory
+});
+var auction_server_test_StoreInMemoryTest = function() {
+	utest_Test.call(this);
+};
+auction_server_test_StoreInMemoryTest.__name__ = "auction.server.test.StoreInMemoryTest";
+auction_server_test_StoreInMemoryTest.__super__ = utest_Test;
+auction_server_test_StoreInMemoryTest.prototype = $extend(utest_Test.prototype,{
+	test: function() {
+		var store = new auction_server_test_NoiseStoreInMemory();
+		var r0 = store.insert({ id : 0});
+		stx_nano_Pledge.prj(r0).handle(function(_) {
+			utest_Assert.equals(1,store.data.length,null,{ fileName : "src/main/haxe/auction/server/test/StoreInMemoryTest.hx", lineNumber : 11, className : "auction.server.test.StoreInMemoryTest", methodName : "test"});
+		});
+	}
+	,__initializeUtest__: function() {
+		var _gthis = this;
+		var init = utest_Test.prototype.__initializeUtest__.call(this);
+		init.tests.push({ name : "test", dependencies : [], execute : function() {
+			_gthis.test();
+			return utest_Async.getResolved();
+		}});
+		return init;
+	}
+	,__class__: auction_server_test_StoreInMemoryTest
 });
 var auction_server_test_TinkPureTest = function() {
 	utest_Test.call(this);
@@ -1712,8 +1860,8 @@ auction_server_test_UserTest.__name__ = "auction.server.test.UserTest";
 auction_server_test_UserTest.__super__ = utest_Test;
 auction_server_test_UserTest.prototype = $extend(utest_Test.prototype,{
 	test: function() {
-		var session_model = new auction_server_session_SessionSchema().mock_memory();
-		var self = stx_nano_PledgeLift.fudge(new auction_server_user_UserSchema().pull(session_model));
+		var session_model = new auction_common_model_session_SessionSchema().mock_memory();
+		var self = stx_nano_PledgeLift.fudge(new auction_common_model_user_UserSchema().pull(session_model));
 		var user_model;
 		switch(self._hx_index) {
 		case 0:
@@ -1760,142 +1908,6 @@ auction_server_test_UserTest.prototype = $extend(utest_Test.prototype,{
 		return init;
 	}
 	,__class__: auction_server_test_UserTest
-});
-var auction_server_user_User = function(name,pass,id,role,bids,sessions) {
-	this.name = name;
-	this.pass = pass;
-	this.role = role;
-	this.id = id;
-	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,bids);
-	var tmp;
-	if(self._hx_index == 0) {
-		var v = self.v;
-		tmp = v;
-	} else {
-		tmp = [];
-	}
-	this.bids = tmp;
-	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,sessions);
-	var tmp;
-	if(self._hx_index == 0) {
-		var v = self.v;
-		tmp = v;
-	} else {
-		tmp = [];
-	}
-	this.sessions = tmp;
-};
-auction_server_user_User.__name__ = "auction.server.user.User";
-auction_server_user_User.__super__ = auction_server_store_VO;
-auction_server_user_User.prototype = $extend(auction_server_store_VO.prototype,{
-	clone: function() {
-		return new cloner_Cloner().clone(this);
-	}
-	,id: null
-	,name: null
-	,pass: null
-	,bids: null
-	,sessions: null
-	,role: null
-	,get_uid: function() {
-		return this.id;
-	}
-	,__class__: auction_server_user_User
-});
-var auction_server_user_UserId = {};
-auction_server_user_UserId.toInt = function(this1) {
-	return this1;
-};
-auction_server_user_UserId.toIntKey = function(this1) {
-	var _e = this1;
-	return { toInt : function() {
-		return auction_server_user_UserId.toInt(_e);
-	}};
-};
-var auction_server_user_UserModelApi = function() { };
-auction_server_user_UserModelApi.__name__ = "auction.server.user.UserModelApi";
-auction_server_user_UserModelApi.__isInterface__ = true;
-auction_server_user_UserModelApi.__interfaces__ = [auction_server_store_StoreApi];
-auction_server_user_UserModelApi.prototype = {
-	sign_in: null
-	,__class__: auction_server_user_UserModelApi
-};
-var auction_server_user_UserMockMemoryModel = function(session) {
-	auction_server_store_MemoryStore.call(this);
-	this.session = session;
-};
-auction_server_user_UserMockMemoryModel.__name__ = "auction.server.user.UserMockMemoryModel";
-auction_server_user_UserMockMemoryModel.__interfaces__ = [auction_server_user_UserModelApi];
-auction_server_user_UserMockMemoryModel.__super__ = auction_server_store_MemoryStore;
-auction_server_user_UserMockMemoryModel.prototype = $extend(auction_server_store_MemoryStore.prototype,{
-	session: null
-	,sign_in: function(credentials) {
-		var _gthis = this;
-		var user = stx_lift_ArrayLift.search(this.data,function(user) {
-			return user.name == credentials.name;
-		});
-		var pass;
-		switch(user._hx_index) {
-		case 0:
-			var t = user.v;
-			pass = t.pass == credentials.pass;
-			break;
-		case 1:
-			pass = false;
-			break;
-		}
-		return stx_nano_lift_LiftNano.if_else(pass,function() {
-			var u = stx_pico_OptionLift.fudge(user);
-			var s = auction_server_session_Session.pure(u.get_uid());
-			return stx_nano_Pledge.flat_map(_gthis.session.insert(s),function(_) {
-				var next = u.clone();
-				next.sessions.push(s.get_uid());
-				return stx_nano_Pledge.map(_gthis.update(u),function(_) {
-					return true;
-				});
-			});
-		},function() {
-			return stx_nano_Pledge.make(stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,false));
-		});
-	}
-	,__class__: auction_server_user_UserMockMemoryModel
-});
-var auction_server_user_UserSchema = function() {
-	stx_pico_Clazz.call(this);
-};
-auction_server_user_UserSchema.__name__ = "auction.server.user.UserSchema";
-auction_server_user_UserSchema.__super__ = stx_pico_Clazz;
-auction_server_user_UserSchema.prototype = $extend(stx_pico_Clazz.prototype,{
-	make: function(name,pass,id,role,bids,sessions) {
-		return new auction_server_user_User(name,pass,id,role,bids,sessions);
-	}
-	,mock: function() {
-		var users = [];
-		if(!stx_nano_Resource.exists("users")) {
-			var this1 = stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "src/main/haxe/auction/server/user/UserSchema.hx", lineNumber : 9, className : "auction.server.user.UserSchema", methodName : "mock"});
-			throw haxe_Exception.thrown(new stx_nano_Err(stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,stx_nano_FailureSum.ERR_OF("E_ResourceNotFound")),haxe_ds_Option.None,this1));
-		}
-		var this1 = "users";
-		var input = JSON.parse(stx_nano_Resource.string(this1)).data;
-		var _g = 0;
-		while(_g < input.length) {
-			var x = input[_g];
-			++_g;
-			var data = new auction_server_user_User(x.name,x.pass,x.id,x.role,[],[]);
-			users.push(data);
-		}
-		return users;
-	}
-	,pull: function(session) {
-		var users = this.mock();
-		var collection = new auction_server_user_UserMockMemoryModel(session);
-		return stx_nano_Pledge.bind_fold(users,function(next,memo) {
-			return stx_nano_Pledge.map(collection.insert(next),function(_) {
-				return collection;
-			});
-		},collection);
-	}
-	,__class__: auction_server_user_UserSchema
 });
 var cloner_Cloner = function() {
 	this.stringMapCloner = new cloner_MapCloner(this,haxe_ds_StringMap);
@@ -6162,7 +6174,7 @@ stx_LiftFutureToSlot.toSlot = function(ft,pos) {
 var stx_LiftLazyFutureToSlot = function() { };
 stx_LiftLazyFutureToSlot.__name__ = "stx.LiftLazyFutureToSlot";
 stx_LiftLazyFutureToSlot.toSlot = function(fn) {
-	return stx_nano_Slot.Guard(fn(),{ fileName : "stx/Nano.hx", lineNumber : 89, className : "stx.LiftLazyFutureToSlot", methodName : "toSlot"});
+	return stx_nano_Slot.Guard(fn(),{ fileName : "stx/Nano.hx", lineNumber : 90, className : "stx.LiftLazyFutureToSlot", methodName : "toSlot"});
 };
 var stx_Test = function() { };
 stx_Test.__name__ = "stx.Test";
@@ -8248,9 +8260,10 @@ var stx_fail_AuctionFailure = $hxEnums["stx.fail.AuctionFailure"] = { __ename__:
 	,E_AuctionFailed: ($_=function(str) { return {_hx_index:0,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_AuctionFailed",$_.__params__ = ["str"],$_)
 	,E_AuctionEnded: {_hx_name:"E_AuctionEnded",_hx_index:1,__enum__:"stx.fail.AuctionFailure",toString:$estr}
 	,E_NoSuchAuction: {_hx_name:"E_NoSuchAuction",_hx_index:2,__enum__:"stx.fail.AuctionFailure",toString:$estr}
-	,E_Golgi_Error: ($_=function(error) { return {_hx_index:3,error:error,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Golgi_Error",$_.__params__ = ["error"],$_)
+	,E_LostRequest: {_hx_name:"E_LostRequest",_hx_index:3,__enum__:"stx.fail.AuctionFailure",toString:$estr}
+	,E_Golgi_Error: ($_=function(error) { return {_hx_index:4,error:error,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_Golgi_Error",$_.__params__ = ["error"],$_)
 };
-stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.E_AuctionFailed,stx_fail_AuctionFailure.E_AuctionEnded,stx_fail_AuctionFailure.E_NoSuchAuction,stx_fail_AuctionFailure.E_Golgi_Error];
+stx_fail_AuctionFailure.__constructs__ = [stx_fail_AuctionFailure.E_AuctionFailed,stx_fail_AuctionFailure.E_AuctionEnded,stx_fail_AuctionFailure.E_NoSuchAuction,stx_fail_AuctionFailure.E_LostRequest,stx_fail_AuctionFailure.E_Golgi_Error];
 var stx_fail_LogFailure = $hxEnums["stx.fail.LogFailure"] = { __ename__:"stx.fail.LogFailure",__constructs__:null
 	,E_Log_UnderLogLevel: {_hx_name:"E_Log_UnderLogLevel",_hx_index:0,__enum__:"stx.fail.LogFailure",toString:$estr}
 	,E_Log_SourceNotInPackage: ($_=function(source,dir) { return {_hx_index:1,source:source,dir:dir,__enum__:"stx.fail.LogFailure",toString:$estr}; },$_._hx_name="E_Log_SourceNotInPackage",$_.__params__ = ["source","dir"],$_)
@@ -10086,6 +10099,53 @@ stx_nano_Defect.entype = function(this1) {
 stx_nano_Defect.concat = function(this1,that) {
 	return this1.concat(that);
 };
+var stx_nano_Embed = {};
+stx_nano_Embed._new = function() {
+	var this1 = stx_nano__$Embed_Constructor.embed();
+	return this1;
+};
+var stx_nano__$Embed_Constructor = function() {
+	stx_pico_Clazz.call(this);
+};
+stx_nano__$Embed_Constructor.__name__ = "stx.nano._Embed.Constructor";
+stx_nano__$Embed_Constructor.embed = function() {
+	var r = haxe_ds_Option.None;
+	var unpack = null;
+	unpack = function(fn) {
+		r = haxe_ds_Option.None;
+		fn();
+		return r;
+	};
+	var pull = null;
+	pull = function(fn) {
+		r = haxe_ds_Option.None;
+		fn();
+		return stx_pico_OptionLift.fudge(r);
+	};
+	var pack = null;
+	pack = function(v) {
+		var o = haxe_ds_Option.Some(v);
+		return function() {
+			r = o;
+		};
+	};
+	var check = null;
+	check = function(fn) {
+		var _g = unpack(fn);
+		switch(_g._hx_index) {
+		case 0:
+			var _g1 = _g.v;
+			return true;
+		case 1:
+			return false;
+		}
+	};
+	return { pack : pack, unpack : unpack, pull : pull, check : check};
+};
+stx_nano__$Embed_Constructor.__super__ = stx_pico_Clazz;
+stx_nano__$Embed_Constructor.prototype = $extend(stx_pico_Clazz.prototype,{
+	__class__: stx_nano__$Embed_Constructor
+});
 var stx_nano_FailCode = {};
 stx_nano_FailCode._new = function(self) {
 	var this1 = self;
@@ -10532,7 +10592,7 @@ stx_nano_PledgeLift.fudge = function(self) {
 		out = v;
 	});
 	if(out == null) {
-		throw haxe_Exception.thrown(new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_ValueNotReady")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 158, className : "stx.nano.PledgeLift", methodName : "fudge"})));
+		throw haxe_Exception.thrown(new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_ValueNotReady")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 159, className : "stx.nano.PledgeLift", methodName : "fudge"})));
 	}
 	return out;
 };
@@ -10550,6 +10610,19 @@ stx_nano_PledgeLift.errata = function(fn,self) {
 			break;
 		}
 		return stx_nano_Res._new(self);
+	});
+};
+stx_nano_PledgeLift.each = function(self,fn) {
+	stx_nano_Pledge.prj(self).handle(function(res) {
+		switch(res._hx_index) {
+		case 0:
+			var t = res.t;
+			fn(t);
+			break;
+		case 1:
+			var e = res.e;
+			break;
+		}
 	});
 };
 var stx_nano_Pledge = {};
@@ -10629,7 +10702,7 @@ stx_nano_Pledge.fromOption = function(m) {
 		val = stx_nano_lift_LiftNano.accept(stx_nano_Wildcard.__,t);
 		break;
 	case 1:
-		val = stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_UnexpectedNullValueEncountered")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 73, className : "stx.nano._Pledge.Pledge_Impl_", methodName : "fromOption"})));
+		val = stx_nano_lift_LiftNano.reject(stx_nano_Wildcard.__,new stx_nano_Err(haxe_ds_Option.Some(stx_nano_FailureSum.ERR("E_UnexpectedNullValueEncountered")),null,stx_nano_lift_LiftNano.fault(stx_nano_Wildcard.__,{ fileName : "stx/nano/Pledge.hx", lineNumber : 74, className : "stx.nano._Pledge.Pledge_Impl_", methodName : "fromOption"})));
 		break;
 	}
 	var val1 = val;
@@ -12059,8 +12132,6 @@ stx_test_Log.log = function(wildcard) {
 		this1(value,fn(pos));
 	};
 };
-var tink_Clone = function() { };
-tink_Clone.__name__ = "tink.Clone";
 var tink_core_Annex = function(target) {
 	this.target = target;
 	this.registry = new haxe_ds_ObjectMap();
@@ -17452,11 +17523,11 @@ var facade = stx_log_Facade.unit();
 var this1 = stx_log_Signal.get_instance();
 this1.attach(stx_log_Facade.toLoggerApi(facade));
 stx_log_Signal.is_custom = false;
+auction_common_model_bid_BidSchema.counter = new auction_common_pack_Counter();
+auction_common_model_saleable_SaleableVO.counter = new auction_common_pack_Counter();
+auction_common_model_session_SessionSchema.counter = new auction_common_pack_Counter();
+auction_common_model_session_SessionVO.counter = new auction_common_pack_Counter();
 auction_server_Handler._ = auction_server_HandlerLift;
-auction_server_bid_BidSchema.counter = new auction_server_pack_Counter();
-auction_server_saleable_Saleable.counter = new auction_server_pack_Counter();
-auction_server_session_Session.counter = new auction_server_pack_Counter();
-auction_server_session_SessionSchema.counter = new auction_server_pack_Counter();
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe_crypto_Base64.BYTES = haxe_io_Bytes.ofString(haxe_crypto_Base64.CHARS);
 hre_RegExp.LATIN_SMALL_LETTER_G = 103;

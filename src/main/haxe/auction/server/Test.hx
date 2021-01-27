@@ -12,7 +12,7 @@ class Test{
       new AuctionTest(),
       new MacroNotClashTest(),
       new TinkPureTest(),
-      new MemoryStoreTest(),
+      new StoreInMemoryTest(),
       new UserTest(),
       new RouterTest()
     ],[RouterTest]);

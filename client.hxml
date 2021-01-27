@@ -1,12 +1,13 @@
 ./common.hxml
 
--lib colyseus-websocket
--lib openfl
--lib openfl-js
--lib feathersui-openfl
+-cp src/main/ui
 
--D openfl
--D js-es=6
+-lib colyseus-websocket
+-lib haxeui-core
+-lib haxeui-html5
+
+#-D js-es=6
+
 
 --main Client
 --js dist/public/js/client.js

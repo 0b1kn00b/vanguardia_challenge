@@ -1,0 +1,5 @@
+<vbox>
+  <textfield id="name"></textfield>
+  <textfield password="true" id="pass"></textfield>
+  <button text="send" id="send"></button>
+</vbox>

@@ -1,0 +1,29 @@
+<vbox style="padding: 5px;">
+    <hbox>
+      <sign_in></sign_in>
+        <vbox>
+            <tabview>
+              <hbox>
+                <button text="Button" id="button"/>
+                <button text="Button"/>
+                  <dropdown selectedIndex="1">
+                      <data>
+                          <item text="Item 1" />
+                          <item text="Item 2" />
+                          <item text="Item 3" />
+                          <item text="Item 4" />
+                      </data>
+                  </dropdown>
+              </hbox>
+              <grid columns="3">
+                <button text="Button" />
+                <button text="Button" />
+                <button text="Button" />
+                <button text="Button" />
+                <button text="Button" />
+                <button text="Button" />
+              </grid>
+            </tabview>
+        </vbox>            
+    </hbox>
+</vbox>

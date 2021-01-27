@@ -3067,7 +3067,7 @@ stx_LiftFutureToSlot.toSlot = function(ft,pos) {
 var stx_LiftLazyFutureToSlot = function() { };
 stx_LiftLazyFutureToSlot.__name__ = "stx.LiftLazyFutureToSlot";
 stx_LiftLazyFutureToSlot.toSlot = function(fn) {
-	return stx_nano_Slot.Guard(fn(),{ fileName : "stx/Nano.hx", lineNumber : 89, className : "stx.LiftLazyFutureToSlot", methodName : "toSlot"});
+	return stx_nano_Slot.Guard(fn(),{ fileName : "stx/Nano.hx", lineNumber : 90, className : "stx.LiftLazyFutureToSlot", methodName : "toSlot"});
 };
 var stx_fail_AuctionFailure = $hxEnums["stx.fail.AuctionFailure"] = { __ename__:true,__constructs__:null
 	,E_AuctionFailed: ($_=function(str) { return {_hx_index:0,str:str,__enum__:"stx.fail.AuctionFailure",toString:$estr}; },$_._hx_name="E_AuctionFailed",$_.__params__ = ["str"],$_)
@@ -3755,6 +3755,53 @@ stx_nano_Defect.entype = function(this1) {
 stx_nano_Defect.concat = function(this1,that) {
 	return this1.concat(that);
 };
+var stx_nano_Embed = {};
+stx_nano_Embed._new = function() {
+	var this1 = stx_nano__$Embed_Constructor.embed();
+	return this1;
+};
+var stx_nano__$Embed_Constructor = function() {
+	stx_pico_Clazz.call(this);
+};
+stx_nano__$Embed_Constructor.__name__ = "stx.nano._Embed.Constructor";
+stx_nano__$Embed_Constructor.embed = function() {
+	var r = haxe_ds_Option.None;
+	var unpack = null;
+	unpack = function(fn) {
+		r = haxe_ds_Option.None;
+		fn();
+		return r;
+	};
+	var pull = null;
+	pull = function(fn) {
+		r = haxe_ds_Option.None;
+		fn();
+		return stx_pico_OptionLift.fudge(r);
+	};
+	var pack = null;
+	pack = function(v) {
+		var o = haxe_ds_Option.Some(v);
+		return function() {
+			r = o;
+		};
+	};
+	var check = null;
+	check = function(fn) {
+		var _g = unpack(fn);
+		switch(_g._hx_index) {
+		case 0:
+			var _g1 = _g.v;
+			return true;
+		case 1:
+			return false;
+		}
+	};
+	return { pack : pack, unpack : unpack, pull : pull, check : check};
+};
+stx_nano__$Embed_Constructor.__super__ = stx_pico_Clazz;
+stx_nano__$Embed_Constructor.prototype = $extend(stx_pico_Clazz.prototype,{
+	__class__: stx_nano__$Embed_Constructor
+});
 var stx_nano_Err = function(data,prev,pos) {
 	this.data = data;
 	var self = stx_nano_lift_LiftNano.option(stx_nano_Wildcard.__,prev);
@@ -7377,7 +7424,6 @@ tink_core_Lazy.ofConst = function(c) {
 	return new tink_core__$Lazy_LazyConst(c);
 };
 var tink_core__$Lazy_LazyFunc = function(f,from) {
-	this.busy = false;
 	this.f = f;
 	this.from = from;
 };
@@ -7387,7 +7433,6 @@ tink_core__$Lazy_LazyFunc.prototype = {
 	f: null
 	,from: null
 	,result: null
-	,busy: null
 	,underlying: function() {
 		return this.from;
 	}
@@ -7398,13 +7443,9 @@ tink_core__$Lazy_LazyFunc.prototype = {
 		return this.result;
 	}
 	,compute: function() {
-		if(this.busy) {
-			throw haxe_Exception.thrown(new tink_core_TypedError(null,"circular lazyness",{ fileName : "tink/core/Lazy.hx", lineNumber : 85, className : "tink.core._Lazy.LazyFunc", methodName : "compute"}));
-		}
 		var _g = this.f;
 		if(_g != null) {
 			var v = _g;
-			this.busy = true;
 			this.f = null;
 			var _g = this.from;
 			if(_g != null) {
@@ -7424,7 +7465,6 @@ tink_core__$Lazy_LazyFunc.prototype = {
 				}
 			}
 			this.result = v();
-			this.busy = false;
 		}
 	}
 	,__class__: tink_core__$Lazy_LazyFunc
