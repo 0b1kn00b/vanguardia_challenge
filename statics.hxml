@@ -1,5 +1,5 @@
---cmd mkdir dist
---cmd mkdir dist/public
---cmd mkdir dist/public/js
+--cmd mkdir -p dist
+--cmd mkdir -p dist/public
+--cmd mkdir -p dist/public/js
 --cmd cp -r src/main/assets dist/public/
 --cmd cp -r src/main/templates dist/templates

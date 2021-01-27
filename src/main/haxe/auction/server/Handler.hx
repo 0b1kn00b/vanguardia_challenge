@@ -15,9 +15,11 @@ class HandlerLift{
     try{
       var operation   = router.route(path,null,req);
       switch(operation){
-        case Home(_)  : 
+        case Home(_)          : 
           var home = '${js.Node.process.cwd()}/templates/home.html';
           res.sendFile(home);
+        case _404(_)    : 
+        //case Api()
         //case Api()
         default       : (next:Void -> Void)();
       }

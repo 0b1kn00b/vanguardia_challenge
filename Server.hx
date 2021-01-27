@@ -19,16 +19,16 @@ class Server{
         express.use(cast static_);//abracadabra
         express.use(new auction.server.Handler(context,router));
     //websockets ok
-    //var ws                            = ExpressWs.call(express);
-    // var wss                           = ws.app;
-    //     wss
-    //     .ws(
-    //       "/api",
-    //       new auction.server.ws.Handler(auction.server.ws.Module.router()).toWebsocketRequestHandler()
-    //     );
+    var ws                            = ExpressWs.call(express);
+    var wss                           = ws.app;
+        wss
+        .ws(
+          "/api",
+          new auction.server.ws.Handler(auction.server.ws.Module.router()).toWebsocketRequestHandler()
+        );
         
         
-    var server                        = express.listen(3000);
+    var wss                           = wss.listen(3000);
   }
   static public function main(){
     var context                       = new ContextSchema().mock();

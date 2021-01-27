@@ -16,25 +16,22 @@ using auction.client.View;
 using auction.client.ModelClient;
 using auction.client.ViewModel;
 
-class Client{
-  @:expose static public var instance : Future<auction.Client>;
+@:expose class Client{
+  @:expose static public var instance : auction.Client;
 
   public function new(){}
   
   static public function main(){
     haxe.ui.Toolkit.init();
-    var t     = Future.trigger();
-    instance  = t.asFuture();
     
     var view_context_f  = new ViewContextSchema().mock(new Root());
+    trace(view_context_f);
     var context_f       = new ContextInClientSchema().mock();
     
     view_context_f.zip(context_f).each(
       __.decouple(
         (view_context,context) -> {
-          t.trigger(
-            new auction.Client(view_context,context)
-          );
+          Client.instance = new auction.Client(view_context,context);
         }
       )
     );

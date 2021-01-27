@@ -8,8 +8,8 @@ using auction.client.ViewModel;
 
 class Client{
 
-  var view    : ViewContextApi;
-  var data    : ContextInClientApi;
+  public var view    : ViewContextApi;
+  public var data    : ContextInClientApi;
 
   public function new(view,data){
     this.view   = view;
