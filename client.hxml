@@ -5,9 +5,10 @@
 -lib colyseus-websocket
 -lib haxeui-core
 -lib haxeui-html5
+-lib signals
 
 #-D js-es=6
-
+-D dump=pretty
 
 --main Client
 --js dist/public/js/client.js

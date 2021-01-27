@@ -35,13 +35,12 @@ package auction.common.model.auction;
 	public function remaining_time():Option<Float>{
 		return this.end_time.map(ok -> ok - haxe.Timer.stamp());
   }
-	public var saleable 							 	: Int;
+	public var saleable 							 	: SaleableId;
 	public var duration 								: Float;
 	public var start_time 							: Null<Float>;
 
 	public var bids 										: Array<BidId>;
 	
-	public var id												: Int;
 	public function get_uid():AuctionId{
 		return this.id;
 	}

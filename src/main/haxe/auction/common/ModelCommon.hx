@@ -2,35 +2,35 @@ package auction.common;
 
 typedef AuctionFailure            = stx.fail.AuctionFailure;
 
-typedef StoreApi<V:Indexed>       = auction.common.model.store.StoreApi<V>;
-typedef StoreInMemory<V:Indexed>  = auction.common.model.store.StoreInMemory<V>;
+typedef StoreApi<V:Indexed>         = auction.common.model.store.StoreApi<V>;
+typedef StoreInMemory<V:Indexed>    = auction.common.model.store.StoreInMemory<V>;
 
-typedef ContextSchema 					  = auction.common.model.context.ContextSchema;
-typedef ContextApi                = auction.common.model.context.ContextApi;
-typedef ContextCls 					      = auction.common.model.context.ContextCls;
+typedef ContextSchema 					    = auction.common.model.context.ContextSchema;
+typedef ContextApi                  = auction.common.model.context.ContextApi;
+typedef ContextCls 					        = auction.common.model.context.ContextCls;
 
-typedef ApiApi                    = auction.common.model.api.ApiApi;
-typedef ApiCls                    = auction.common.model.api.ApiCls;
-typedef ApiSchema                 = auction.common.model.api.ApiSchema;
+typedef ApiApi                      = auction.common.model.api.ApiApi;
+typedef ApiCls                      = auction.common.model.api.ApiCls;
+typedef ApiSchema                   = auction.common.model.api.ApiSchema;
 
-typedef AuctionSchema             = auction.common.model.auction.AuctionSchema;
-typedef AuctionVO                 = auction.common.model.auction.AuctionVO;
-typedef AuctionModelApi           = auction.common.model.auction.AuctionModelApi;
-typedef AuctionId 							  = auction.common.model.auction.AuctionId;
-typedef AuctionMemoryModel        = auction.common.model.auction.AuctionMemoryModel;
+typedef AuctionSchema               = auction.common.model.auction.AuctionSchema;
+typedef AuctionVO                   = auction.common.model.auction.AuctionVO;
+typedef AuctionModelApi             = auction.common.model.auction.AuctionModelApi;
+typedef AuctionId 							    = auction.common.model.auction.AuctionId;
+typedef AuctionMemoryModel          = auction.common.model.auction.AuctionMemoryModel;
 
-typedef BidSchema								  = auction.common.model.bid.BidSchema;
-typedef BidVO											= auction.common.model.bid.BidVO;
-typedef BidId										  = auction.common.model.bid.BidId;
-typedef BidMemoryModel 					  = auction.common.model.bid.BidMemoryModel;
-typedef BidModelApi               = auction.common.model.bid.BidModelApi;
+typedef BidSchema								    = auction.common.model.bid.BidSchema;
+typedef BidVO											  = auction.common.model.bid.BidVO;
+typedef BidId										    = auction.common.model.bid.BidId;
+typedef BidMemoryModel 					    = auction.common.model.bid.BidMemoryModel;
+typedef BidModelApi                 = auction.common.model.bid.BidModelApi;
 
-typedef SaleableVO								= auction.common.model.saleable.SaleableVO;
-typedef SaleableSchema            = auction.common.model.saleable.SaleableSchema;
-typedef SaleableId							  = auction.common.model.saleable.SaleableId;
-typedef SaleableModelApi				  = auction.common.model.saleable.SaleableModelApi;
-typedef SaleableMemoryModel       = auction.common.model.saleable.SaleableMemoryModel;
-typedef SaleableMockMemoryModel   = auction.common.model.saleable.SaleableMockMemoryModel;
+typedef SaleableVO								  = auction.common.model.saleable.SaleableVO;
+typedef SaleableSchema              = auction.common.model.saleable.SaleableSchema;
+typedef SaleableId							    = auction.common.model.saleable.SaleableId;
+typedef SaleableModelApi				    = auction.common.model.saleable.SaleableModelApi;
+typedef SaleableMemoryModel         = auction.common.model.saleable.SaleableMemoryModel;
+typedef SaleableMockMemoryModel     = auction.common.model.saleable.SaleableMockMemoryModel;
 
 typedef UserVO										= auction.common.model.user.UserVO;
 typedef UserSchema                = auction.common.model.user.UserSchema;

@@ -1,0 +1,5 @@
+<stack id="navigation">
+  <home id="home"></home>
+  <credential id="credential"/>
+  <fault id="fault"/>
+</stack>

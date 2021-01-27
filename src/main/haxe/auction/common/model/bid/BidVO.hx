@@ -15,8 +15,6 @@ package auction.common.model.bid;
 	public var bid 							: CurrencyValue;
 	public var time  						: Float;
 	
-	
-	public var id								: Int;
 	public function get_uid():BidId{
 		return id;
 	}

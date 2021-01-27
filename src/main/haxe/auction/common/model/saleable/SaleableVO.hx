@@ -12,7 +12,7 @@ class SaleableVO extends UniqueKey<SaleableId>{
 	public var name 							: String;
 	public var description 				: String;
 	public var img 								: String;
-	public var id									: Int;
+
 	public function get_uid():SaleableId{
 		return id;
 	}

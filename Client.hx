@@ -2,23 +2,42 @@ import haxe.net.WebSocket;
 
 import haxe.ui.core.Screen;
 
+import tink.CoreApi;
+
 using stx.Pico;
 using stx.Nano;
+
+using auction.common.ModelCommon;
 
 using auction.client.Magic;
 
 using auction.client.UI;
 using auction.client.View;
 using auction.client.ModelClient;
+using auction.client.ViewModel;
 
 class Client{
-  @:expose static public var instance : auction.Client;
+  @:expose static public var instance : Future<auction.Client>;
 
   public function new(){}
   
   static public function main(){
     haxe.ui.Toolkit.init();
-    instance   = new auction.Client(new View(new Root()),new ContextInClientCls());
+    var t     = Future.trigger();
+    instance  = t.asFuture();
+    
+    var view_context_f  = new ViewContextSchema().mock(new Root());
+    var context_f       = new ContextInClientSchema().mock();
+    
+    view_context_f.zip(context_f).each(
+      __.decouple(
+        (view_context,context) -> {
+          t.trigger(
+            new auction.Client(view_context,context)
+          );
+        }
+      )
+    );
   }
 }
 class Ws{

@@ -12,7 +12,6 @@ package auction.common.model.user;
   public function clone(){
     return new Cloner().clone(this);
   }
-  public var id       : Int;
 	public var name	    : String;
   public var pass     : String;
   public var bids 	  : Array<BidId>;

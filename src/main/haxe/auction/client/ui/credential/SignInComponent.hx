@@ -1,6 +1,6 @@
-package auction.client.ui.user;
+package auction.client.ui.credential;
 
-@:build(haxe.ui.macros.ComponentMacros.build("src/main/ui/user/sign_in.xml"))
+@:build(haxe.ui.macros.ComponentMacros.build("src/main/ui/credential/sign_in.xml"))
 class SignInComponent extends haxe.ui.containers.VBox{
   private var form : SignInForm;
   
@@ -10,7 +10,7 @@ class SignInComponent extends haxe.ui.containers.VBox{
   }
   @:bind(send,MouseEvent.CLICK)
   function on_send(e){
-    this.dispatch(UserReq(SignIn(form)).lift());
+    this.dispatch(User_Request(User_SignIn(form)).lift());
   }
   @:bind(name,UIEvent.CHANGE)
   function on_name_change(e){

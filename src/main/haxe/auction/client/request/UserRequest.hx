@@ -1,5 +1,6 @@
 package auction.client.request;
 
 enum UserRequest{
-  SignIn(signin:SignInForm);
+  User_SignIn(signin:SignInForm);
+  User_SignInConfirmed(session_id:SessionId);
 }

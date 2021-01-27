@@ -1,6 +1,17 @@
 <module>
   <components>
+    <component class="auction.client.ui.Root" alias="root"/>
+    <component class="auction.client.ui.NavigationComponent" alias="navigation"/>
+    <component class="auction.client.ui.FaultComponent" alias="fault"/>
+
+    <component class="auction.client.ui.window.WindowComponent" alias="window" />
+
+    <component class="auction.client.ui.app.HomeComponent" alias="home" />
+
+    <component class="auction.client.ui.CredentialComponent" alias="credential" />
+    
+
     <component class="auction.client.ui.TestComponent" alias="testy" />
-    <component class="auction.client.ui.user.SignInComponent" alias="sign_in" />
+    <component class="auction.client.ui.credential.SignInComponent" alias="sign_in" />
   </components>
 </module>
