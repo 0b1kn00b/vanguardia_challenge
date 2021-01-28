@@ -14,9 +14,9 @@ class NavigationViewModel implements NavigationViewModelApi{
     this.home       = new HomeViewModel(this);
     this.credential = new CredentialViewModel(this.data.credential);
   }
-  public function route(req:Request):AppPledge<Noise>{
+  public function route(req:ProtocolInClient):AppPledge<Noise>{
     return switch(req){
-      case Navigation_Request(NavigateTo(location)) : location.head().fold(
+      case Navigation_Protocol(NavigateTo(location)) : location.head().fold(
         ok -> 
           (switch(ok){
             case 'home'       : 

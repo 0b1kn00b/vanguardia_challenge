@@ -3,7 +3,7 @@ package auction;
 using auction.client.Magic;
 using auction.client.View;
 using auction.client.ModelClient;
-using auction.client.Request;
+using auction.client.ProtocolInClient;
 using auction.client.ViewModel;
 
 class Client{
@@ -20,7 +20,7 @@ class Client{
     var t       = Future.trigger();
     var handler = null;
     this.view.add(
-      handler = function (x:AppRes<Request>) : Void {
+      handler = function (x:AppRes<ProtocolInClient>) : Void {
         this.view.route(x).each(
           (_) -> {},
           (e) -> {

@@ -1,6 +1,6 @@
 package auction.client.view.model.context;
 
-@:structInit class ViewContextCls implements ViewContextApi extends signals.Signal1<Res<Request,AuctionFailure>>{
+@:structInit class ViewContextCls implements ViewContextApi extends signals.Signal1<Res<ProtocolInClient,AuctionFailure>>{
   var busy                : Bool;
 
   private function wrap<T,E>(p:Pledge<T,E>):Pledge<T,E>{
@@ -32,11 +32,11 @@ package auction.client.view.model.context;
   
       this.root.registerEvent("request",(evt) -> {
         this.dispatch(
-          __.embed().unpack(evt.data).fold((ok:Request) -> __.accept(ok),() -> __.reject(__.fault().of(E_LostRequest)))
+          __.embed().unpack(evt.data).fold((ok:ProtocolInClient) -> __.accept(ok),() -> __.reject(__.fault().of(E_LostRequest)))
         );
       });
   }
-  public function route(req:AppRes<Request>):AppPledge<Noise>{
+  public function route(req:AppRes<ProtocolInClient>):AppPledge<Noise>{
     return if(!busy){
       switch(req){
         case Accept(r) : 
@@ -46,7 +46,7 @@ package auction.client.view.model.context;
                 (e) -> Pledge.reject(e),
                 ()  -> Pledge.accept(Noise)
               );
-            case User_Request(User_SignIn(form))        :
+            case User_Protocol(SignIn(form))        :
               var result = data.api.user.sign_in(form);
                   result.flat_map(
                     b -> b.if_else(
@@ -58,11 +58,11 @@ package auction.client.view.model.context;
                       ),
                       () -> Pledge.accept(['home'])
                     ).flat_map(
-                      location -> route(__.accept(Navigation_Request(NavigateTo(location))))
+                      location -> route(__.accept(Navigation_Protocol(NavigateTo(location))))
                     )
                   );
               Pledge.accept(Noise);
-            case User_Request(User_SignInConfirmed(_))  :
+            //case User_Protocol(User_SignInConfirmed(_))  :
               // //TODO should be PREVIOUS
               // data.location.most_recent()
               // .map(
@@ -76,8 +76,8 @@ package auction.client.view.model.context;
               //   (loc) -> view.dispatch(__.accept(Navigation_Request(NavigateTo(loc)))),
               //   (e)   -> view.dispatch(__.accept(SigExit(e)))
               // );
-              Pledge.accept(Noise);
-            case Navigation_Request(path)    :
+              //Pledge.accept(Noise);
+            case Navigation_Protocol(path)    :
               // wrap(this.view.navigation.route.to(path));
               Pledge.accept(Noise);
             case AppFail(e) : 

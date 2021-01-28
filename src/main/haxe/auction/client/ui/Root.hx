@@ -7,7 +7,7 @@ class Root extends Box{
   }
   // @:bind(button, MouseEvent.CLICK)
   // function onButton(e) {
-  //   // var request       = new Request();
+  //   // var request       = new ProtocolInClient();
   //   //     this.dispatch(new ClientEvent(request));
   // }
 }

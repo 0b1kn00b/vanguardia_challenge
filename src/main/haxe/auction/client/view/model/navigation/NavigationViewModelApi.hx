@@ -7,5 +7,5 @@ interface NavigationViewModelApi{
   public final home         : HomeViewModel;
   public final credential   : CredentialViewModel;
 
-  public function route(req:Request):AppPledge<Noise>;
+  public function route(req:ProtocolInClient):AppPledge<Noise>;
 }

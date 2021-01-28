@@ -10,7 +10,7 @@ class SignInComponent extends haxe.ui.containers.VBox{
   }
   @:bind(send,MouseEvent.CLICK)
   function on_send(e){
-    this.dispatch(User_Request(User_SignIn(form)).lift());
+    this.dispatch(User_Protocol(SignIn(form)).lift());
   }
   @:bind(name,UIEvent.CHANGE)
   function on_name_change(e){

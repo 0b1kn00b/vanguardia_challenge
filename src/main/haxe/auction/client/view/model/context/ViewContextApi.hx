@@ -9,8 +9,8 @@ import signals.Signal;
 interface ViewContextApi {
   public final navigation : NavigationViewModelApi;  
 
-  public function add(callback:AppRes<Request>->Void, ?fireOnce:Bool = false, ?priority:Int = 0, ?fireOnAdd:Null<Bool> = null):BaseSignal<AppRes<Request>->Void>;
-  public function remove(callback:EitherType<Bool, AppRes<Request>->Void> = false):Void;
+  public function add(callback:AppRes<ProtocolInClient>->Void, ?fireOnce:Bool = false, ?priority:Int = 0, ?fireOnAdd:Null<Bool> = null):BaseSignal<AppRes<ProtocolInClient>->Void>;
+  public function remove(callback:EitherType<Bool, AppRes<ProtocolInClient>->Void> = false):Void;
 
-  public function route(request:AppRes<Request>):AppPledge<Noise>;
+  public function route(request:AppRes<ProtocolInClient>):AppPledge<Noise>;
 }

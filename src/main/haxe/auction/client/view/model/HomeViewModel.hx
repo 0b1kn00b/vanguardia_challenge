@@ -6,6 +6,6 @@ class HomeViewModel{
     this.navigation = navigation;
   }
   public function go_to_sign_in(){
-    return this.navigation.route(Navigation_Request(NavigateTo(['credential','sign_in'])));
+    return this.navigation.route(Navigation_Protocol(NavigateTo(['credential','sign_in'])));
   }
 }

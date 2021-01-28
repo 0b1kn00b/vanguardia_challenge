@@ -1,4 +1,4 @@
-import haxe.net.WebSocket;
+
 
 import haxe.ui.core.Screen;
 
@@ -16,41 +16,35 @@ using auction.client.View;
 using auction.client.ModelClient;
 using auction.client.ViewModel;
 
-@:expose class Client{
-  @:expose static public var instance : auction.Client;
+import auction.client.ws.Request;
+import auction.client.ws.Request.RequestSchema;
 
-  public function new(){}
+@:expose class Client extends auction.client.Ws{
+  @:expose static public var instance : Client;
+
+  public final req : RequestSchema;
+
+  public function new(){
+    this.req = new RequestSchema();
+    super();
+  }
   
   static public function main(){
-    haxe.ui.Toolkit.init();
+    Client.instance = new Client();
+    // haxe.ui.Toolkit.init();
+
     
-    var view_context_f  = new ViewContextSchema().mock(new Root());
-    trace(view_context_f);
-    var context_f       = new ContextInClientSchema().mock();
+    // var view_context_f  = new ViewContextSchema().mock(new Root());
+    // trace(view_context_f);
+    // var context_f       = new ContextInClientSchema().mock();
     
-    view_context_f.zip(context_f).each(
-      __.decouple(
-        (view_context,context) -> {
-          Client.instance = new auction.Client(view_context,context);
-        }
-      )
-    );
-  }
-}
-class Ws{
-  public var ws : WebSocket;
-  public function new(){
-    this.ws = WebSocket.create("ws://127.0.0.1:3000/api", ['echo-protocol'], false);
-    ws.onopen = function() {
-      trace('open!');  
-      ws.sendString('plumalum');
-    };
-    ws.onmessageString = function(message) {
-        trace('message from server!' + (message.length > 200 ? message.substr(0, 200) + '...' : message));
-        trace('message.length=' + message.length);
-    }
-    ws.onerror = function(message:String):Void{
-      trace('error: $message');
-    } 
+    // view_context_f.zip(context_f).each(
+    //   __.decouple(
+    //     (view_context,context) -> {
+    //       Client.instance = new auction.Client(view_context,context);
+    //     }
+    //   )
+    // );
+ 
   }
 }
