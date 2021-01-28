@@ -1,1 +1,1 @@
---cmd rm -r dist/
+--cmd rm -rf dist/
