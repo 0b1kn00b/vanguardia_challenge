@@ -55,7 +55,7 @@ using auction.client.ViewModel;
           case P_IncomingClientResponse(x) : response.trigger(__.accept(x));
           default : 
         }
-        this.remove(respond);
+        this.remove(respond); 
       }
     );
     this.dispatch(P_OutgoingClientRequest(req));

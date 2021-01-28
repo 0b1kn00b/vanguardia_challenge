@@ -11,5 +11,5 @@ enum AuctionFailure{
   E_Bubble(f:Err<AuctionFailure>);
   E_Golgi_Error(error:golgi.Error);
   E_RouteNotFound(route:Array<String>);
-  
+  E_EmptyWsRequest;
 }

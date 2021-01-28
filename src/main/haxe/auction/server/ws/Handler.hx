@@ -38,10 +38,14 @@ class HandlerImpl{
   public function new(model){
     this.model = model;
   }
-  public function apply(protocol:Protocol):AppPledge<IncomingClientResponse>{
-    switch(protocol){
-      case UserProtocol(SignIn(form)) : model.user.sign_in(form).map(IC_SessionId)
-      default                         : Pledge.reject(IC_UnImplemented(protocol));
+  public function apply(protocol:Null<Protocol>):AppPledge<IncomingClientResponse>{
+    return switch(protocol){
+      case P_OutgoingClientRequest(OCR_User(SignIn(form)))    : 
+        model.api.user.sign_in(form).map(ICR_Session);
+      default                                                 : 
+        Pledge.accept(ICR_UnImplemented(protocol));
+      case null                                               : 
+        Pledge.accept(ICR_Error(E_EmptyWsRequest));
     }
   }
 

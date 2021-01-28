@@ -14,7 +14,7 @@ class UserRequestSchema extends Clazz{
     this.mock = haxe.Json.parse(__.resource('users').string()).data;
   }
   public function sign_in(form:SignInForm){
-    return SignIn(form);
+    return P_OutgoingClientRequest(OCR_User(SignIn(form)));
   }
   public function user_one(){
     return sign_in(this.mock[0]);

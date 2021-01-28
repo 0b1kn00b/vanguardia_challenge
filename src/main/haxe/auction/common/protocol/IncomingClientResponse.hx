@@ -1,6 +1,7 @@
 package auction.common.protocol;
 
 enum IncomingClientResponse{
-  IC_UnImplemented(protocol:Protocol);
-  IC_SessionId(id:SessionId);
+  ICR_Error(f:AuctionFailure);
+  ICR_UnImplemented(protocol:Protocol);
+  ICR_Session(opt:Option<SessionId>);
 }
