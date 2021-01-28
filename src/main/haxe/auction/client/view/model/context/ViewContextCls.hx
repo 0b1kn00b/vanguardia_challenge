@@ -48,19 +48,25 @@ package auction.client.view.model.context;
               );
             case User_Protocol(SignIn(form))        :
               var result = data.api.user.sign_in(form);
-                  result.flat_map(
-                    b -> b.if_else(
-                      () -> this.data.location.previous().map(
-                        (opt) -> opt.fold(
-                          (ok)  -> ok.location,
-                          ()    -> ['home']
-                        )
-                      ),
-                      () -> Pledge.accept(['home'])
+                  result
+                    .map(
+                      (opt) -> {
+                        this.data.session_id = opt;
+                        return opt.fold(_ -> true,()->false);
+                      }
                     ).flat_map(
-                      location -> route(__.accept(Navigation_Protocol(NavigateTo(location))))
-                    )
-                  );
+                      b -> b.if_else(
+                        () -> this.data.location.previous().map(
+                          (opt) -> opt.fold(
+                            (ok)  -> ok.location,
+                            ()    -> ['home']
+                          )
+                        ),
+                        () -> Pledge.accept(['home'])
+                      ).flat_map(
+                        location -> route(__.accept(Navigation_Protocol(NavigateTo(location))))
+                      )
+                    );
               Pledge.accept(Noise);
             //case User_Protocol(User_SignInConfirmed(_))  :
               // //TODO should be PREVIOUS

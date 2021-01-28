@@ -46,7 +46,19 @@ using auction.client.ViewModel;
       default : 
     }
   }
-  public function request(req:OutgoingClientRequest){
+  public function request(req:OutgoingClientRequest):Pledge<IncomingClientResponse,AuctionFailure>{
+    var respond   = null;
+    var response  = Future.trigger();
+    this.add(
+      respond = function(protocol:Protocol){
+        switch(protocol){
+          case P_IncomingClientResponse(x) : response.trigger(__.accept(x));
+          default : 
+        }
+        this.remove(respond);
+      }
+    );
     this.dispatch(P_OutgoingClientRequest(req));
+    return Pledge.lift(response);
   }
 }

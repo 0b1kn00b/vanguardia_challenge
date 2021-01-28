@@ -10,12 +10,13 @@ class UserRequestSchema extends Clazz{
   var mock : Array<SignInForm>;
   
   public function new(){
-    this.mock : Array<SignInForm> = __.resource('users').data;
+    super();
+    this.mock = haxe.Json.parse(__.resource('users').string()).data;
   }
   public function sign_in(form:SignInForm){
     return SignIn(form);
   }
-  public var user_one(){
+  public function user_one(){
     return sign_in(this.mock[0]);
   }
 }

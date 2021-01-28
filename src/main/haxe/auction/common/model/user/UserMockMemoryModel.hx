@@ -8,7 +8,7 @@ class UserMockMemoryModel extends StoreInMemory<UserVO> implements UserModelApi{
     this.session = session;
   }
   //yes I know this should be salty.
-  public function sign_in(credentials : { name : String, pass : String }):Pledge<Bool,AuctionFailure>{
+  public function sign_in(credentials : { name : String, pass : String }):Pledge<Option<SessionId>,AuctionFailure>{
     var user = this.data.search(
       (user:UserVO) -> user.name == credentials.name
     );
@@ -24,11 +24,11 @@ class UserMockMemoryModel extends StoreInMemory<UserVO> implements UserModelApi{
           (_) -> {
             var next = u.clone();
                 next.sessions.push(s.uid);
-            return this.update(u).map(_ -> true);
+            return this.update(u).map(_ -> Some(s.uid));
           }
         );
       },
-      () -> Pledge.accept(false)
+      () -> Pledge.accept(None)
     );
   }
 }

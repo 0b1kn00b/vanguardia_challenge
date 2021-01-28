@@ -12,7 +12,9 @@ abstract Handler(auction.server.ws.RequestHandler) from auction.server.ws.Reques
       ws.on('message', function(msg:String) {
         var decode : Protocol = haxe.Unserializer.run(msg);
         trace(decode);
-        handler.apply(decode);
+        handler.apply(decode).each(
+          (res) -> ws.send(haxe.Serializer.run(P_IncomingClientResponse(res)))
+        );
       });
       ws.on('open',
         () -> {
@@ -36,10 +38,10 @@ class HandlerImpl{
   public function new(model){
     this.model = model;
   }
-  public function apply(protocol:Protocol){
-    trace(protocol);
+  public function apply(protocol:Protocol):AppPledge<IncomingClientResponse>{
     switch(protocol){
-      default : 
+      case UserProtocol(SignIn(form)) : model.user.sign_in(form).map(IC_SessionId)
+      default                         : Pledge.reject(IC_UnImplemented(protocol));
     }
   }
 
